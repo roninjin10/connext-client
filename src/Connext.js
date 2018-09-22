@@ -2911,44 +2911,40 @@ class Connext {
       depositType = Object.keys(CHANNEL_TYPES)[1]
     } else if (ethDeposit) {
       depositType = Object.keys(CHANNEL_TYPES)[0]
+    } else {
+      throw new ChannelUpdateError(methodName, `Invalid deposit type detected`)
     }
-
+    // result is the latest result of both the token and eth deposits
     let result, token, tokenApproval
-    switch (CHANNEL_TYPES[depositType]) {
-      case CHANNEL_TYPES.ETH:
-        // call contract method
-        result = await this.channelManagerInstance.methods
+    if (ethDeposit && ethDeposit.gt(Web3.utils.toBN('0')) {
+      // call contract method
+      result = await this.channelManagerInstance.methods
+      .deposit(
+        channelId, // PARAM NOT IN CONTRACT YET, SHOULD BE
+        recipient,
+        deposits.ethDeposit,
+        false
+      )
+      .send({
+        from: sender,
+        value: deposits.ethDeposit,
+        gas: 1000000,
+      })
+    }
+    if (tokenDeposit && tokenDeposit.gt(Web3.utils.toBN('0')) {
+      // must pre-approve transfer
+      result = await this.channelManagerInstance.methods
         .deposit(
           channelId, // PARAM NOT IN CONTRACT YET, SHOULD BE
           recipient,
-          deposits.ethDeposit,
+          deposits.tokenDeposit,
           false
         )
         .send({
           from: sender,
-          value: deposits.ethDeposit,
           gas: 1000000,
         })
-        break
-      case CHANNEL_TYPES.TOKEN:
-      // must pre-approve transfer
-        result = await this.channelManagerInstance.methods
-          .deposit(
-            channelId, // PARAM NOT IN CONTRACT YET, SHOULD BE
-            recipient,
-            deposits.tokenDeposit,
-            false
-          )
-          .send({
-            from: sender,
-            gas: 1000000,
-          })
-        
-        break
-      default:
-        throw new ChannelUpdateError(methodName, `Invalid deposit type detected`)
     }
-
     if (!result.transactionHash) {
       throw new ContractError(
         methodName,
