@@ -419,26 +419,6 @@ class Connext {
     // generate additional initial lc params
     const channelId = Connext.getNewChannelId()
 
-      {
-        channelId,
-        challenge, 
-        initialDeposits, 
-        channelType, 
-        tokenAddress, 
-        sender, 
-        ethDeposit: initialDeposits.ethDeposit.toString(10),
-        tokenDeposit: initialDeposits.tokenDeposit.toString(10),
-      }
-    )
-    const contractResult = await this.createChannelContractHandler ({
-      channelId,
-      challenge,
-      initialDeposits,
-      channelType,
-      tokenAddress: tokenAddress ? tokenAddress : null,
-      sender,
-    })
-
     return channelId
   }
 
