@@ -305,6 +305,7 @@ class Connext {
     this.ingridAddress = ingridAddress.toLowerCase()
     this.watcherUrl = watcherUrl
     this.ingridUrl = ingridUrl
+    console.log('contract address', contractAddress)
     this.channelManagerInstance = new this.web3.eth.Contract(
       channelManagerAbi.abi,
       contractAddress
@@ -348,17 +349,20 @@ class Connext {
    * @returns {Promise} resolves to the ledger channel id of the created channel
    */
   async openChannel (initialDeposits, tokenAddress = null, sender = null, challenge = null) {
+    console.log('351 i iz in open channel')
     // validate params
     const methodName = 'openChannel'
     const isValidDepositObject = { presence: true, isValidDepositObject: true }
     const isAddress = { presence: true, isAddress: true }
     const isPositiveInt = { presence: true, isPositiveInt: true }
+    console.log(' 357 i iz in open channel')
     Connext.validatorsResponseToError(
       validate.single(initialDeposits, isValidDepositObject),
       methodName,
       'initialDeposits'
     )
     if (tokenAddress) {
+    console.log('364 i iz in open channel')
       // should probably do a better check for contract specific addresses
       // maybe a whitelisted token address array
       Connext.validatorsResponseToError(
@@ -367,17 +371,21 @@ class Connext {
         'tokenAddress'
       )
     }
+    console.log('373 i iz in open channel')
     if (sender) {
+    console.log('375 i iz in open channel')
       Connext.validatorsResponseToError(
         validate.single(sender, isAddress),
         methodName,
         'sender'
       )
     } else {
+    console.log('382 i iz in open channel')
       const accounts = await this.web3.eth.getAccounts()
       sender = accounts[0].toLowerCase()
     }
     if (challenge) {
+    console.log('387 i iz in open channel')
       Connext.validatorsResponseToError(
         validate.single(challenge, isPositiveInt),
         methodName,
@@ -385,6 +393,7 @@ class Connext {
       )
     } else {
       // get challenge timer from ingrid
+    console.log('395 i iz in open channel')
       challenge = await this.getChallengeTimer()
       
     }
@@ -402,6 +411,7 @@ class Connext {
       throw new ChannelOpenError(methodName, `Error determining channel deposit types.`)
     }
     // verify channel does not exist between ingrid and sender
+    console.log('413 i iz in open channel')
     let channel = await this.getChannelByPartyA(sender)
     if (channel != null && CHANNEL_STATES[channel.state] === 1) {
       throw new ChannelOpenError(
@@ -419,13 +429,25 @@ class Connext {
     // generate additional initial lc params
     const channelId = Connext.getNewChannelId()
 
+    console.log('431 i iz in open channel',
+      {
+        channelId,
+        challenge, 
+        initialDeposits, 
+        channelType, 
+        tokenAddress, 
+        sender, 
+        ethDeposit: initialDeposits.ethDeposit.toString(10),
+        tokenDeposit: initialDeposits.tokenDeposit.toString(10),
+      }
+    )
     const contractResult = await this.createChannelContractHandler ({
       channelId,
       challenge,
       initialDeposits,
       channelType,
       tokenAddress: tokenAddress ? tokenAddress : null,
-      sender
+      sender,
     })
     console.log('tx hash:', contractResult.transactionHash)
 
@@ -2733,18 +2755,39 @@ class Connext {
         //   from: sender
         // })
         if (true) {// tokenApproval) {
+          console.log('calling createChannel', {
+            channelId,
+            ingridAddress,
+            challenge,
+            tokenAddress,
+            initialDeposits: [initialDeposits.ethDeposit.toString(10), initialDeposits.tokenDeposit.toString(10)],
+            gas: 75000,
+          })
+          /*
+          const estimateGas = await this.channelManagerInstance.methods.createChannel(
+            channelId, 
+            ingridAddress, 
+            challenge, 
+            tokenAddress, 
+            [initialDeposits.ethDeposit, initialDeposits.tokenDeposit]
+          ).estimateGas({
+            from: sender,
+            value: initialDeposits.ethDeposit,
+            gas: 4000000
+          })
+          console.log('estimate gas', estimateGas)*/
           result = await this.channelManagerInstance.methods
             .createChannel(
-              channelId, 
-              ingridAddress, 
-              challenge, 
-              tokenAddress, 
+              channelId,
+              ingridAddress,
+              challenge,
+              tokenAddress,
               [initialDeposits.ethDeposit, initialDeposits.tokenDeposit]
             )
             .send({
               from: sender,
               value: initialDeposits.ethDeposit,
-              gas: 750000
+              gas: 224548,
           })
         } else {
           throw new ChannelOpenError(methodName, 'Token transfer failed.')
