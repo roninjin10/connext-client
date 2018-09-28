@@ -1,3 +1,5 @@
+//@ts-check
+
 const channelManagerAbi = require('../artifacts/LedgerChannel.json')
 const util = require('ethereumjs-util')
 const Web3 = require('web3')
@@ -413,7 +415,7 @@ class Connext {
     if (sender.toLowerCase() === this.ingridAddress.toLowerCase()) {
       throw new ChannelOpenError(methodName, 'Cannot open a channel with yourself')
     }
-
+    console.log('initialDeposits', initialDeposits.ethDeposit.toString(10))
     // generate additional initial lc params
     const channelId = Connext.getNewChannelId()
 
@@ -423,7 +425,7 @@ class Connext {
       initialDeposits,
       channelType,
       tokenAddress: tokenAddress ? tokenAddress : null,
-      sender
+      sender,
     })
     console.log('tx hash:', contractResult.transactionHash)
 
@@ -2698,12 +2700,14 @@ class Connext {
         break
       case CHANNEL_TYPES.TOKEN: // TOKEN
         // approve token transfer
-        token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
-        tokenApproval = await token.methods.approve(ingridAddress, initialDeposits.tokenDeposit).send( {
-          from: sender,
-          gas: 750000
-        })
-        if (tokenApproval) {
+        // currently wallet is calling approve not connext-client
+        // token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
+        
+        // tokenApproval = await token.methods.approve(ingridAddress, initialDeposits.tokenDeposit).send( {
+        //  from: sender,
+        //  gas: 750000
+        // })
+        if (true) { // tokenApproval) { // commented out because not doing approval
           result = await this.channelManagerInstance.methods
           .createChannel(
             channelId, 
@@ -2717,28 +2721,43 @@ class Connext {
             gas: 750000
           })
         } else {
-          throw new ChannelOpenError(methodName, 'Token transfer failed.')
+          throw new ChannelOpenError(methodName, 'Token transfer failed.') 
         }
         break
       case CHANNEL_TYPES.TOKEN_ETH: // ETH/TOKEN
+        // commented out because wallet is currently doing approvals
         // approve token transfer
-        token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
-        tokenApproval = await token.approve.call(ingridAddress, initialDeposits.tokenDeposit, {
-          from: sender
-        })
-        if (tokenApproval) {
+        // token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
+
+        // tokenApproval = await token.methods.approve.call(ingridAddress, initialDeposits.tokenDeposit, {
+        //   from: sender
+        // })
+        if (true) {// tokenApproval) {
+                    /*
+          const estimateGas = await this.channelManagerInstance.methods.createChannel(
+            channelId, 
+            ingridAddress, 
+            challenge, 
+            tokenAddress, 
+            [initialDeposits.ethDeposit, initialDeposits.tokenDeposit]
+          ).estimateGas({
+            from: sender,
+            value: initialDeposits.ethDeposit,
+            gas: 4000000
+          })
+          console.log('estimate gas', estimateGas)*/
           result = await this.channelManagerInstance.methods
             .createChannel(
-              channelId, 
-              ingridAddress, 
-              challenge, 
-              tokenAddress, 
+              channelId,
+              ingridAddress,
+              challenge,
+              tokenAddress,
               [initialDeposits.ethDeposit, initialDeposits.tokenDeposit]
             )
             .send({
               from: sender,
               value: initialDeposits.ethDeposit,
-              gas: 750000
+              gas: 750000,
           })
         } else {
           throw new ChannelOpenError(methodName, 'Token transfer failed.')
@@ -2916,6 +2935,7 @@ class Connext {
     let result, token, tokenApproval
     switch (CHANNEL_TYPES[depositType]) {
       case CHANNEL_TYPES.ETH:
+      case CHANNEL_TYPES.TOKEN_ETH:
         // call contract method
         result = await this.channelManagerInstance.methods
         .deposit(
@@ -2931,6 +2951,7 @@ class Connext {
         })
         break
       case CHANNEL_TYPES.TOKEN:
+      case CHANNEL_TYPES.TOKEN_ETH:
       // must pre-approve transfer
         result = await this.channelManagerInstance.methods
           .deposit(
@@ -3859,7 +3880,7 @@ class Connext {
   /**
    * Returns an object representing a ledger channel.
    *
-   * @param {String} lcId - the ledger channel id
+   * @param {String} channelId - the ledger channel id
    * @returns {Promise} resolves to the ledger channel object
    */
   async getChannelById (channelId) {
