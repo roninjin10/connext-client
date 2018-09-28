@@ -2700,12 +2700,14 @@ class Connext {
         break
       case CHANNEL_TYPES.TOKEN: // TOKEN
         // approve token transfer
-        token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
-        tokenApproval = await token.methods.approve(ingridAddress, initialDeposits.tokenDeposit).send( {
-          from: sender,
-          gas: 750000
-        })
-        if (tokenApproval) {
+        // currently wallet is calling approve not connext-client
+        // token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
+        
+        // tokenApproval = await token.methods.approve(ingridAddress, initialDeposits.tokenDeposit).send( {
+        //  from: sender,
+        //  gas: 750000
+        // })
+        if (true) { // tokenApproval) { // commented out because not doing approval
           result = await this.channelManagerInstance.methods
           .createChannel(
             channelId, 
@@ -2719,16 +2721,18 @@ class Connext {
             gas: 750000
           })
         } else {
-          throw new ChannelOpenError(methodName, 'Token transfer failed.')
+          throw new ChannelOpenError(methodName, 'Token transfer failed.') 
         }
         break
       case CHANNEL_TYPES.TOKEN_ETH: // ETH/TOKEN
+        // commented out because wallet is currently doing approvals
         // approve token transfer
-        token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
-        tokenApproval = await token.approve.call(ingridAddress, initialDeposits.tokenDeposit, {
-          from: sender
-        })
-        if (tokenApproval) {
+        // token = new this.web3.eth.Contract(tokenAbi, tokenAddress)
+
+        // tokenApproval = await token.methods.approve.call(ingridAddress, initialDeposits.tokenDeposit, {
+        //   from: sender
+        // })
+        if (true) {// tokenApproval) {
           result = await this.channelManagerInstance.methods
             .createChannel(
               channelId, 
