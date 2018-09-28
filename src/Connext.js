@@ -1,3 +1,5 @@
+//@ts-check
+
 const channelManagerAbi = require('../artifacts/LedgerChannel.json')
 const util = require('ethereumjs-util')
 const Web3 = require('web3')
@@ -2916,6 +2918,7 @@ class Connext {
     let result, token, tokenApproval
     switch (CHANNEL_TYPES[depositType]) {
       case CHANNEL_TYPES.ETH:
+      case CHANNEL_TYPES.TOKEN_ETH:
         // call contract method
         result = await this.channelManagerInstance.methods
         .deposit(
@@ -2931,6 +2934,7 @@ class Connext {
         })
         break
       case CHANNEL_TYPES.TOKEN:
+      case CHANNEL_TYPES.TOKEN_ETH:
       // must pre-approve transfer
         result = await this.channelManagerInstance.methods
           .deposit(
@@ -3859,7 +3863,7 @@ class Connext {
   /**
    * Returns an object representing a ledger channel.
    *
-   * @param {String} lcId - the ledger channel id
+   * @param {String} channelId - the ledger channel id
    * @returns {Promise} resolves to the ledger channel object
    */
   async getChannelById (channelId) {
