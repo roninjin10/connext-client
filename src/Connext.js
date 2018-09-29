@@ -3129,6 +3129,7 @@ class Connext {
     let result
     switch (CHANNEL_TYPES[depositType]) {
       case CHANNEL_TYPES.ETH:
+      case CHANNEL_TYPES.TOKEN_ETH:
         // call contract method
         result = await this.channelManagerInstance.methods
         .deposit(
@@ -3144,6 +3145,7 @@ class Connext {
         })
         break
       case CHANNEL_TYPES.TOKEN:
+      case CHANNEL_TYPES.TOKEN_ETH:
       // must pre-approve transfer
         result = await this.channelManagerInstance.methods
           .deposit(
