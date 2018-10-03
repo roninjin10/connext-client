@@ -401,17 +401,14 @@ var Connext = function () {
   (0, _createClass3.default)(Connext, [{
     key: 'openChannel',
     value: function () {
-      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(initialDeposits) {
+      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(initialDeposits) {
         var tokenAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-        var _this = this;
-
         var sender = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
         var challenge = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-        var methodName, isValidDepositObject, isAddress, isPositiveInt, accounts, ethDeposit, tokenDeposit, channelType, channel, channelId, contractResult, initialUntrackedDeposits, untrackedDeposits;
-        return _regenerator2.default.wrap(function _callee2$(_context2) {
+        var methodName, isValidDepositObject, isAddress, isPositiveInt, accounts, ethDeposit, tokenDeposit, channelType, channel, channelId, contractResult;
+        return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context.prev = _context.next) {
               case 0:
                 // validate params
                 methodName = 'openChannel';
@@ -427,39 +424,39 @@ var Connext = function () {
                 }
 
                 if (!sender) {
-                  _context2.next = 10;
+                  _context.next = 10;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context2.next = 14;
+                _context.next = 14;
                 break;
 
               case 10:
-                _context2.next = 12;
+                _context.next = 12;
                 return this.web3.eth.getAccounts();
 
               case 12:
-                accounts = _context2.sent;
+                accounts = _context.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 14:
                 if (!challenge) {
-                  _context2.next = 18;
+                  _context.next = 18;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(challenge, isPositiveInt), methodName, 'isPositiveInt');
-                _context2.next = 21;
+                _context.next = 21;
                 break;
 
               case 18:
-                _context2.next = 20;
+                _context.next = 20;
                 return this.getChallengeTimer();
 
               case 20:
-                challenge = _context2.sent;
+                challenge = _context.sent;
 
               case 21:
                 // determine channel type
@@ -467,46 +464,46 @@ var Connext = function () {
                 channelType = void 0;
 
                 if (!(tokenAddress && ethDeposit)) {
-                  _context2.next = 27;
+                  _context.next = 27;
                   break;
                 }
 
                 channelType = Object.keys(CHANNEL_TYPES)[2];
-                _context2.next = 36;
+                _context.next = 36;
                 break;
 
               case 27:
                 if (tokenAddress) {
-                  _context2.next = 31;
+                  _context.next = 31;
                   break;
                 }
 
                 channelType = Object.keys(CHANNEL_TYPES)[0];
-                _context2.next = 36;
+                _context.next = 36;
                 break;
 
               case 31:
                 if (!(tokenAddress && tokenDeposit && !ethDeposit)) {
-                  _context2.next = 35;
+                  _context.next = 35;
                   break;
                 }
 
                 channelType = Object.keys(CHANNEL_TYPES)[1];
-                _context2.next = 36;
+                _context.next = 36;
                 break;
 
               case 35:
                 throw new ChannelOpenError(methodName, 'Error determining channel deposit types.');
 
               case 36:
-                _context2.next = 38;
+                _context.next = 38;
                 return this.getChannelByPartyA(sender);
 
               case 38:
-                channel = _context2.sent;
+                channel = _context.sent;
 
                 if (!(channel != null && CHANNEL_STATES[channel.state] === 1)) {
-                  _context2.next = 41;
+                  _context.next = 41;
                   break;
                 }
 
@@ -514,7 +511,7 @@ var Connext = function () {
 
               case 41:
                 if (!(sender.toLowerCase() === this.ingridAddress.toLowerCase())) {
-                  _context2.next = 43;
+                  _context.next = 43;
                   break;
                 }
 
@@ -524,7 +521,7 @@ var Connext = function () {
 
                 // generate additional initial lc params
                 channelId = Connext.getNewChannelId();
-                _context2.next = 46;
+                _context.next = 46;
                 return this.createChannelContractHandler({
                   channelId: channelId,
                   challenge: challenge,
@@ -535,68 +532,15 @@ var Connext = function () {
                 });
 
               case 46:
-                contractResult = _context2.sent;
+                contractResult = _context.sent;
+                return _context.abrupt('return', channelId);
 
-                console.log('tx hash:', contractResult.transactionHash);
-                console.log('getting untracked deposit');
-                _context2.next = 51;
-                return this.getUntrackedDeposits(channel.channelId);
-
-              case 51:
-                initialUntrackedDeposits = _context2.sent.length;
-                untrackedDeposits = void 0;
-                _context2.next = 55;
-                return interval(function () {
-                  var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(iterationNumber, stop) {
-                    return _regenerator2.default.wrap(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            _context.next = 2;
-                            return _this.getUntrackedDeposits(channel.channelId);
-
-                          case 2:
-                            untrackedDeposits = _context.sent;
-
-                            if (untrackedDeposits !== [] && untrackedDeposits.length === initialUntrackedDeposits + 1) {
-                              stop();
-                            }
-
-                          case 4:
-                          case 'end':
-                            return _context.stop();
-                        }
-                      }
-                    }, _callee, _this);
-                  }));
-
-                  return function (_x6, _x7) {
-                    return _ref3.apply(this, arguments);
-                  };
-                }(), 2000);
-
-              case 55:
-                if (!untrackedDeposits) {
-                  _context2.next = 58;
-                  break;
-                }
-
-                _context2.next = 58;
-                return this.signUntrackedDeposits({
-                  untrackedDeposits: untrackedDeposits,
-                  channelId: channel.channelId,
-                  sender: sender
-                });
-
-              case 58:
-                return _context2.abrupt('return', channelId);
-
-              case 59:
+              case 48:
               case 'end':
-                return _context2.stop();
+                return _context.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee, this);
       }));
 
       function openChannel(_x5) {
@@ -631,17 +575,17 @@ var Connext = function () {
   }, {
     key: 'deposit',
     value: function () {
-      var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(deposits) {
+      var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(deposits) {
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-        var _this2 = this;
+        var _this = this;
 
         var recipient = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : sender;
         var tokenAddress = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
         var methodName, isValidDepositObject, isAddress, accounts, channel, contractResult, initialUntrackedDeposits, untrackedDeposits, results;
-        return _regenerator2.default.wrap(function _callee4$(_context4) {
+        return _regenerator2.default.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 // validate params
                 methodName = 'deposit';
@@ -649,11 +593,11 @@ var Connext = function () {
                 isAddress = { presence: true, isAddress: true };
 
                 Connext.validatorsResponseToError(validate.single(deposits, isValidDepositObject), methodName, 'deposits');
-                _context4.next = 6;
+                _context3.next = 6;
                 return this.web3.eth.getAccounts();
 
               case 6:
-                accounts = _context4.sent;
+                accounts = _context3.sent;
 
                 if (sender) {
                   Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
@@ -666,14 +610,14 @@ var Connext = function () {
                   recipient = accounts[0].toLowerCase();
                 }
 
-                _context4.next = 11;
+                _context3.next = 11;
                 return this.getChannelByPartyA(recipient);
 
               case 11:
-                channel = _context4.sent;
+                channel = _context3.sent;
 
                 if (!(CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENED)) {
-                  _context4.next = 14;
+                  _context3.next = 14;
                   break;
                 }
 
@@ -681,7 +625,7 @@ var Connext = function () {
 
               case 14:
                 if (!(channel.partyA.toLowerCase() !== recipient.toLowerCase() && channel.partyI.toLowerCase() !== recipient.toLowerCase())) {
-                  _context4.next = 16;
+                  _context3.next = 16;
                   break;
                 }
 
@@ -689,14 +633,14 @@ var Connext = function () {
 
               case 16:
                 if (!(sender.toLowerCase() !== channel.partyA)) {
-                  _context4.next = 18;
+                  _context3.next = 18;
                   break;
                 }
 
                 throw new ChannelUpdateError(methodName, 'Cannot sign for deposit state update unless it is your channel.');
 
               case 18:
-                _context4.next = 20;
+                _context3.next = 20;
                 return this.depositContractHandler({
                   channelId: channel.channelId,
                   deposits: deposits,
@@ -706,34 +650,34 @@ var Connext = function () {
                 });
 
               case 20:
-                contractResult = _context4.sent;
+                contractResult = _context3.sent;
 
                 if (contractResult) {
-                  _context4.next = 23;
+                  _context3.next = 23;
                   break;
                 }
 
                 throw new ChannelUpdateError(methodName, 'Error with on chain deposit');
 
               case 23:
-                _context4.next = 25;
+                _context3.next = 25;
                 return this.getUntrackedDeposits(channel.channelId);
 
               case 25:
-                initialUntrackedDeposits = _context4.sent.length;
+                initialUntrackedDeposits = _context3.sent.length;
                 untrackedDeposits = void 0;
-                _context4.next = 29;
+                _context3.next = 29;
                 return interval(function () {
-                  var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(iterationNumber, stop) {
-                    return _regenerator2.default.wrap(function _callee3$(_context3) {
+                  var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(iterationNumber, stop) {
+                    return _regenerator2.default.wrap(function _callee2$(_context2) {
                       while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context2.prev = _context2.next) {
                           case 0:
-                            _context3.next = 2;
-                            return _this2.getUntrackedDeposits(channel.channelId);
+                            _context2.next = 2;
+                            return _this.getUntrackedDeposits(channel.channelId);
 
                           case 2:
-                            untrackedDeposits = _context3.sent;
+                            untrackedDeposits = _context2.sent;
 
                             if (untrackedDeposits !== [] && untrackedDeposits.length === initialUntrackedDeposits + 1) {
                               stop();
@@ -741,19 +685,19 @@ var Connext = function () {
 
                           case 4:
                           case 'end':
-                            return _context3.stop();
+                            return _context2.stop();
                         }
                       }
-                    }, _callee3, _this2);
+                    }, _callee2, _this);
                   }));
 
-                  return function (_x12, _x13) {
-                    return _ref5.apply(this, arguments);
+                  return function (_x10, _x11) {
+                    return _ref4.apply(this, arguments);
                   };
                 }(), 2000);
 
               case 29:
-                _context4.next = 31;
+                _context3.next = 31;
                 return this.signUntrackedDeposits({
                   untrackedDeposits: untrackedDeposits,
                   channelId: channel.channelId,
@@ -761,28 +705,28 @@ var Connext = function () {
                 });
 
               case 31:
-                results = _context4.sent;
+                results = _context3.sent;
 
                 if (!(results.length === 0)) {
-                  _context4.next = 36;
+                  _context3.next = 36;
                   break;
                 }
 
-                return _context4.abrupt('return', results[0]);
+                return _context3.abrupt('return', results[0]);
 
               case 36:
-                return _context4.abrupt('return', results);
+                return _context3.abrupt('return', results);
 
               case 37:
               case 'end':
-                return _context4.stop();
+                return _context3.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee3, this);
       }));
 
-      function deposit(_x11) {
-        return _ref4.apply(this, arguments);
+      function deposit(_x9) {
+        return _ref3.apply(this, arguments);
       }
 
       return deposit;
@@ -790,33 +734,33 @@ var Connext = function () {
   }, {
     key: 'getUntrackedDeposits',
     value: function () {
-      var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(channelId) {
+      var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(channelId) {
         var methodName, isHex, response;
-        return _regenerator2.default.wrap(function _callee5$(_context5) {
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 methodName = 'getUntrackedDeposits';
                 isHex = { presence: true, isHex: true };
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHex), methodName, 'channelId');
-                _context5.next = 5;
+                _context4.next = 5;
                 return this.networking.get('ledgerchannel/' + channelId + '/untrackeddeposits');
 
               case 5:
-                response = _context5.sent;
-                return _context5.abrupt('return', response.data);
+                response = _context4.sent;
+                return _context4.abrupt('return', response.data);
 
               case 7:
               case 'end':
-                return _context5.stop();
+                return _context4.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee4, this);
       }));
 
-      function getUntrackedDeposits(_x14) {
-        return _ref6.apply(this, arguments);
+      function getUntrackedDeposits(_x12) {
+        return _ref5.apply(this, arguments);
       }
 
       return getUntrackedDeposits;
@@ -824,17 +768,17 @@ var Connext = function () {
   }, {
     key: 'signUntrackedDeposits',
     value: function () {
-      var _ref8 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(_ref7) {
-        var untrackedDeposits = _ref7.untrackedDeposits,
-            channelId = _ref7.channelId,
-            _ref7$sender = _ref7.sender,
-            sender = _ref7$sender === undefined ? null : _ref7$sender;
+      var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(_ref6) {
+        var untrackedDeposits = _ref6.untrackedDeposits,
+            channelId = _ref6.channelId,
+            _ref6$sender = _ref6.sender,
+            sender = _ref6$sender === undefined ? null : _ref6$sender;
 
         var methodName, isHex, isAddress, accounts, channel, depositedWithoutUpdates, channelEthBalance, channelTokenBalance, nonce, signedDeposits, totalTokenDeposit, totalEthDeposit, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, untrackedDeposit, amountDeposited, sig, obj, results, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, signedDeposit, result;
 
-        return _regenerator2.default.wrap(function _callee6$(_context6) {
+        return _regenerator2.default.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 methodName = 'signUntrackedDeposits';
                 isHex = { presence: true, isHex: true };
@@ -844,29 +788,29 @@ var Connext = function () {
                 // add deposit object validation
 
                 if (!sender) {
-                  _context6.next = 8;
+                  _context5.next = 8;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context6.next = 12;
+                _context5.next = 12;
                 break;
 
               case 8:
-                _context6.next = 10;
+                _context5.next = 10;
                 return this.web3.eth.getAccounts();
 
               case 10:
-                accounts = _context6.sent;
+                accounts = _context5.sent;
 
                 sender = accounts[0];
 
               case 12:
-                _context6.next = 14;
+                _context5.next = 14;
                 return this.getChannelById(channelId);
 
               case 14:
-                channel = _context6.sent;
+                channel = _context5.sent;
                 depositedWithoutUpdates = channel.nonce === 0;
                 channelEthBalance = Web3.utils.toBN(channel.ethBalanceA);
                 channelTokenBalance = Web3.utils.toBN(channel.tokenBalanceA);
@@ -877,12 +821,12 @@ var Connext = function () {
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
                 _iteratorError = undefined;
-                _context6.prev = 25;
+                _context5.prev = 25;
                 _iterator = untrackedDeposits[Symbol.iterator]();
 
               case 27:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context6.next = 48;
+                  _context5.next = 48;
                   break;
                 }
 
@@ -890,17 +834,17 @@ var Connext = function () {
                 amountDeposited = Web3.utils.toBN(untrackedDeposit.deposit);
 
                 if (!(untrackedDeposit.recipient === channel.partyI)) {
-                  _context6.next = 32;
+                  _context5.next = 32;
                   break;
                 }
 
-                return _context6.abrupt('continue', 45);
+                return _context5.abrupt('continue', 45);
 
               case 32:
                 sig = '';
 
                 if (!(untrackedDeposit.recipient === channel.partyA)) {
-                  _context6.next = 42;
+                  _context5.next = 42;
                   break;
                 }
 
@@ -908,7 +852,7 @@ var Connext = function () {
                 untrackedDeposit.isToken ? depositedWithoutUpdates ? totalTokenDeposit = totalTokenDeposit : totalTokenDeposit = totalTokenDeposit.add(amountDeposited) : depositedWithoutUpdates ? totalEthDeposit = totalEthDeposit : totalEthDeposit = totalEthDeposit.add(amountDeposited);
 
                 untrackedDeposit.isToken ? depositedWithoutUpdates ? channelTokenBalance = channelTokenBalance : channelTokenBalance = channelTokenBalance.add(amountDeposited) : depositedWithoutUpdates ? channelEthBalance = channelEthBalance : channelEthBalance = channelEthBalance.add(amountDeposited);
-                _context6.next = 39;
+                _context5.next = 39;
                 return this.createChannelStateUpdate({
                   channelId: channel.channelId,
                   nonce: nonce,
@@ -932,8 +876,8 @@ var Connext = function () {
                 });
 
               case 39:
-                sig = _context6.sent;
-                _context6.next = 43;
+                sig = _context5.sent;
+                _context5.next = 43;
                 break;
 
               case 42:
@@ -951,42 +895,42 @@ var Connext = function () {
 
               case 45:
                 _iteratorNormalCompletion = true;
-                _context6.next = 27;
+                _context5.next = 27;
                 break;
 
               case 48:
-                _context6.next = 54;
+                _context5.next = 54;
                 break;
 
               case 50:
-                _context6.prev = 50;
-                _context6.t0 = _context6['catch'](25);
+                _context5.prev = 50;
+                _context5.t0 = _context5['catch'](25);
                 _didIteratorError = true;
-                _iteratorError = _context6.t0;
+                _iteratorError = _context5.t0;
 
               case 54:
-                _context6.prev = 54;
-                _context6.prev = 55;
+                _context5.prev = 54;
+                _context5.prev = 55;
 
                 if (!_iteratorNormalCompletion && _iterator.return) {
                   _iterator.return();
                 }
 
               case 57:
-                _context6.prev = 57;
+                _context5.prev = 57;
 
                 if (!_didIteratorError) {
-                  _context6.next = 60;
+                  _context5.next = 60;
                   break;
                 }
 
                 throw _iteratorError;
 
               case 60:
-                return _context6.finish(57);
+                return _context5.finish(57);
 
               case 61:
-                return _context6.finish(54);
+                return _context5.finish(54);
 
               case 62:
 
@@ -999,12 +943,12 @@ var Connext = function () {
                 _iteratorNormalCompletion2 = true;
                 _didIteratorError2 = false;
                 _iteratorError2 = undefined;
-                _context6.prev = 67;
+                _context5.prev = 67;
                 _iterator2 = signedDeposits[Symbol.iterator]();
 
               case 69:
                 if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                  _context6.next = 88;
+                  _context5.next = 88;
                   break;
                 }
 
@@ -1012,79 +956,79 @@ var Connext = function () {
 
                 console.log('Posting signed ' + (signedDeposit.isToken ? 'ERC20' : 'ETH') + ' deposit of ' + signedDeposit.deposit + ' to hub');
                 result = void 0;
-                _context6.prev = 73;
-                _context6.next = 76;
+                _context5.prev = 73;
+                _context5.next = 76;
                 return this.networking.post('ledgerchannel/' + channel.channelId + '/deposit', signedDeposit);
 
               case 76:
-                result = _context6.sent.data;
+                result = _context5.sent.data;
 
                 console.log('Successfully posted.');
-                _context6.next = 84;
+                _context5.next = 84;
                 break;
 
               case 80:
-                _context6.prev = 80;
-                _context6.t1 = _context6['catch'](73);
+                _context5.prev = 80;
+                _context5.t1 = _context5['catch'](73);
 
                 console.log('Error posting update.');
-                result = _context6.t1.message;
+                result = _context5.t1.message;
 
               case 84:
                 results.push(result);
 
               case 85:
                 _iteratorNormalCompletion2 = true;
-                _context6.next = 69;
+                _context5.next = 69;
                 break;
 
               case 88:
-                _context6.next = 94;
+                _context5.next = 94;
                 break;
 
               case 90:
-                _context6.prev = 90;
-                _context6.t2 = _context6['catch'](67);
+                _context5.prev = 90;
+                _context5.t2 = _context5['catch'](67);
                 _didIteratorError2 = true;
-                _iteratorError2 = _context6.t2;
+                _iteratorError2 = _context5.t2;
 
               case 94:
-                _context6.prev = 94;
-                _context6.prev = 95;
+                _context5.prev = 94;
+                _context5.prev = 95;
 
                 if (!_iteratorNormalCompletion2 && _iterator2.return) {
                   _iterator2.return();
                 }
 
               case 97:
-                _context6.prev = 97;
+                _context5.prev = 97;
 
                 if (!_didIteratorError2) {
-                  _context6.next = 100;
+                  _context5.next = 100;
                   break;
                 }
 
                 throw _iteratorError2;
 
               case 100:
-                return _context6.finish(97);
+                return _context5.finish(97);
 
               case 101:
-                return _context6.finish(94);
+                return _context5.finish(94);
 
               case 102:
-                return _context6.abrupt('return', results);
+                return _context5.abrupt('return', results);
 
               case 103:
               case 'end':
-                return _context6.stop();
+                return _context5.stop();
             }
           }
-        }, _callee6, this, [[25, 50, 54, 62], [55,, 57, 61], [67, 90, 94, 102], [73, 80], [95,, 97, 101]]);
+        }, _callee5, this, [[25, 50, 54, 62], [55,, 57, 61], [67, 90, 94, 102], [73, 80], [95,, 97, 101]]);
       }));
 
-      function signUntrackedDeposits(_x15) {
-        return _ref8.apply(this, arguments);
+      function signUntrackedDeposits(_x13) {
+        return _ref7.apply(this, arguments);
       }
 
       return signUntrackedDeposits;
@@ -1114,16 +1058,16 @@ var Connext = function () {
   }, {
     key: 'openThread',
     value: function () {
-      var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(_ref9) {
-        var to = _ref9.to,
-            _ref9$deposit = _ref9.deposit,
-            deposit = _ref9$deposit === undefined ? null : _ref9$deposit,
-            _ref9$sender = _ref9.sender,
-            sender = _ref9$sender === undefined ? null : _ref9$sender;
+      var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(_ref8) {
+        var to = _ref8.to,
+            _ref8$deposit = _ref8.deposit,
+            deposit = _ref8$deposit === undefined ? null : _ref8$deposit,
+            _ref8$sender = _ref8.sender,
+            sender = _ref8$sender === undefined ? null : _ref8$sender;
         var methodName, isAddress, isValidDepositObject, accounts, subchanA, subchanB, channel, updateType, channelId, threadInitialState, sigVC0, sigAtoI, response;
-        return _regenerator2.default.wrap(function _callee7$(_context7) {
+        return _regenerator2.default.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 // validate params
                 methodName = 'openThread';
@@ -1136,45 +1080,45 @@ var Connext = function () {
                 }
 
                 if (!sender) {
-                  _context7.next = 9;
+                  _context6.next = 9;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context7.next = 13;
+                _context6.next = 13;
                 break;
 
               case 9:
-                _context7.next = 11;
+                _context6.next = 11;
                 return this.web3.eth.getAccounts();
 
               case 11:
-                accounts = _context7.sent;
+                accounts = _context6.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 13:
                 if (!(sender.toLowerCase() === to.toLowerCase())) {
-                  _context7.next = 15;
+                  _context6.next = 15;
                   break;
                 }
 
                 throw new ThreadOpenError(methodName, 'Cannot open a channel with yourself');
 
               case 15:
-                _context7.next = 17;
+                _context6.next = 17;
                 return this.getChannelByPartyA(sender);
 
               case 17:
-                subchanA = _context7.sent;
-                _context7.next = 20;
+                subchanA = _context6.sent;
+                _context6.next = 20;
                 return this.getChannelByPartyA(to);
 
               case 20:
-                subchanB = _context7.sent;
+                subchanB = _context6.sent;
 
                 if (!(!subchanB || !subchanA)) {
-                  _context7.next = 23;
+                  _context6.next = 23;
                   break;
                 }
 
@@ -1182,7 +1126,7 @@ var Connext = function () {
 
               case 23:
                 if (!(CHANNEL_STATES[subchanB.state] !== 1 || CHANNEL_STATES[subchanA.state] !== 1)) {
-                  _context7.next = 25;
+                  _context6.next = 25;
                   break;
                 }
 
@@ -1200,7 +1144,7 @@ var Connext = function () {
                 }
 
                 if (!(deposit.tokenDeposit && Web3.utils.toBN(subchanA.tokenBalanceA).lt(deposit.tokenDeposit))) {
-                  _context7.next = 28;
+                  _context6.next = 28;
                   break;
                 }
 
@@ -1208,21 +1152,21 @@ var Connext = function () {
 
               case 28:
                 if (!(deposit.ethDeposit && Web3.utils.toBN(subchanA.ethBalanceA).lt(deposit.ethDeposit))) {
-                  _context7.next = 30;
+                  _context6.next = 30;
                   break;
                 }
 
                 throw new ThreadOpenError(methodName, 'Insufficient value to open channel with provided ETH deposit');
 
               case 30:
-                _context7.next = 32;
+                _context6.next = 32;
                 return this.getThreadByParties({ partyA: sender, partyB: to });
 
               case 32:
-                channel = _context7.sent;
+                channel = _context6.sent;
 
                 if (!channel) {
-                  _context7.next = 35;
+                  _context6.next = 35;
                   break;
                 }
 
@@ -1234,33 +1178,33 @@ var Connext = function () {
                 updateType = void 0;
 
                 if (!(deposit.ethDeposit && deposit.tokenDeposit)) {
-                  _context7.next = 40;
+                  _context6.next = 40;
                   break;
                 }
 
                 // token and eth
                 updateType = Object.keys(CHANNEL_TYPES)[2];
-                _context7.next = 49;
+                _context6.next = 49;
                 break;
 
               case 40:
                 if (!deposit.tokenDeposit) {
-                  _context7.next = 44;
+                  _context6.next = 44;
                   break;
                 }
 
                 updateType = Object.keys(CHANNEL_TYPES)[1];
-                _context7.next = 49;
+                _context6.next = 49;
                 break;
 
               case 44:
                 if (!deposit.ethDeposit) {
-                  _context7.next = 48;
+                  _context6.next = 48;
                   break;
                 }
 
                 updateType = Object.keys(CHANNEL_TYPES)[0];
-                _context7.next = 49;
+                _context6.next = 49;
                 break;
 
               case 48:
@@ -1283,12 +1227,12 @@ var Connext = function () {
                   updateType: updateType,
                   signer: sender
                 };
-                _context7.next = 53;
+                _context6.next = 53;
                 return this.createThreadStateUpdate(threadInitialState);
 
               case 53:
-                sigVC0 = _context7.sent;
-                _context7.next = 56;
+                sigVC0 = _context6.sent;
+                _context6.next = 56;
                 return this.createChannelUpdateOnThreadOpen({
                   threadInitialState: threadInitialState,
                   channel: subchanA,
@@ -1296,13 +1240,13 @@ var Connext = function () {
                 });
 
               case 56:
-                sigAtoI = _context7.sent;
+                sigAtoI = _context6.sent;
 
 
                 // ingrid should add vc params to db
                 response = void 0;
-                _context7.prev = 58;
-                _context7.next = 61;
+                _context6.prev = 58;
+                _context6.next = 61;
                 return this.networking.post('virtualchannel/', {
                   channelId: channelId,
                   partyA: sender.toLowerCase(),
@@ -1314,28 +1258,28 @@ var Connext = function () {
                 });
 
               case 61:
-                response = _context7.sent;
-                _context7.next = 67;
+                response = _context6.sent;
+                _context6.next = 67;
                 break;
 
               case 64:
-                _context7.prev = 64;
-                _context7.t0 = _context7['catch'](58);
-                throw new ThreadOpenError(methodName, _context7.t0.message);
+                _context6.prev = 64;
+                _context6.t0 = _context6['catch'](58);
+                throw new ThreadOpenError(methodName, _context6.t0.message);
 
               case 67:
-                return _context7.abrupt('return', response.data.channelId);
+                return _context6.abrupt('return', response.data.channelId);
 
               case 68:
               case 'end':
-                return _context7.stop();
+                return _context6.stop();
             }
           }
-        }, _callee7, this, [[58, 64]]);
+        }, _callee6, this, [[58, 64]]);
       }));
 
-      function openThread(_x16) {
-        return _ref10.apply(this, arguments);
+      function openThread(_x14) {
+        return _ref9.apply(this, arguments);
       }
 
       return openThread;
@@ -1357,12 +1301,12 @@ var Connext = function () {
   }, {
     key: 'joinThread',
     value: function () {
-      var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8(threadId) {
+      var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(threadId) {
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isHexStrict, isAddress, thread, accounts, subchanA, subchanB, thread0, threadSig, subchanSig, result;
-        return _regenerator2.default.wrap(function _callee8$(_context8) {
+        return _regenerator2.default.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 // validate params
                 methodName = 'joinThread';
@@ -1370,25 +1314,25 @@ var Connext = function () {
                 isAddress = { presence: true, isAddress: true };
 
                 Connext.threadId(validate.single(channelId, isHexStrict), methodName, 'threadId');
-                _context8.next = 6;
+                _context7.next = 6;
                 return this.getThreadById(threadId);
 
               case 6:
-                thread = _context8.sent;
+                thread = _context7.sent;
 
                 if (!(thread === null)) {
-                  _context8.next = 9;
+                  _context7.next = 9;
                   break;
                 }
 
                 throw new ThreadOpenError(methodName, 'Channel not found');
 
               case 9:
-                _context8.next = 11;
+                _context7.next = 11;
                 return this.web3.eth.getAccounts();
 
               case 11:
-                accounts = _context8.sent;
+                accounts = _context7.sent;
 
                 if (sender) {
                   Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
@@ -1397,26 +1341,26 @@ var Connext = function () {
                 }
 
                 if (!(sender.toLowerCase() !== thread.partyB)) {
-                  _context8.next = 15;
+                  _context7.next = 15;
                   break;
                 }
 
                 throw new ThreadOpenError(methodName, 'Incorrect channel counterparty');
 
               case 15:
-                _context8.next = 17;
+                _context7.next = 17;
                 return this.getChannelByPartyA(thread.partyA);
 
               case 17:
-                subchanA = _context8.sent;
-                _context8.next = 20;
+                subchanA = _context7.sent;
+                _context7.next = 20;
                 return this.getChannelByPartyA(sender);
 
               case 20:
-                subchanB = _context8.sent;
+                subchanB = _context7.sent;
 
                 if (!(subchanB === null || subchanA === null)) {
-                  _context8.next = 23;
+                  _context7.next = 23;
                   break;
                 }
 
@@ -1424,7 +1368,7 @@ var Connext = function () {
 
               case 23:
                 if (!(CHANNEL_STATES[subchanB.state] !== CHANNEL_STATES.LCS_OPENED || CHANNEL_STATES[subchanA.state] !== CHANNEL_STATES.LCS_OPENED)) {
-                  _context8.next = 25;
+                  _context7.next = 25;
                   break;
                 }
 
@@ -1442,12 +1386,12 @@ var Connext = function () {
                   tokenBalanceB: Web3.utils.toBN(0),
                   signer: sender
                 };
-                _context8.next = 28;
+                _context7.next = 28;
                 return this.createThreadStateUpdate(thread0);
 
               case 28:
-                threadSig = _context8.sent;
-                _context8.next = 31;
+                threadSig = _context7.sent;
+                _context7.next = 31;
                 return this.createChannelUpdateOnThreadOpen({
                   threadInitialState: thread0,
                   channel: subchanB,
@@ -1455,8 +1399,8 @@ var Connext = function () {
                 });
 
               case 31:
-                subchanSig = _context8.sent;
-                _context8.next = 34;
+                subchanSig = _context7.sent;
+                _context7.next = 34;
                 return this.joinThreadHandler({
                   threadSig: threadSig,
                   subchanSig: subchanSig,
@@ -1464,19 +1408,19 @@ var Connext = function () {
                 });
 
               case 34:
-                result = _context8.sent;
-                return _context8.abrupt('return', result);
+                result = _context7.sent;
+                return _context7.abrupt('return', result);
 
               case 36:
               case 'end':
-                return _context8.stop();
+                return _context7.stop();
             }
           }
-        }, _callee8, this);
+        }, _callee7, this);
       }));
 
-      function joinThread(_x18) {
-        return _ref11.apply(this, arguments);
+      function joinThread(_x16) {
+        return _ref10.apply(this, arguments);
       }
 
       return joinThread;
@@ -1492,14 +1436,14 @@ var Connext = function () {
   }, {
     key: 'updateBalances',
     value: function () {
-      var _ref12 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10(payments) {
-        var _this3 = this;
+      var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(payments) {
+        var _this2 = this;
 
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isAddress, isArray, accounts, updatedPayments, response;
-        return _regenerator2.default.wrap(function _callee10$(_context10) {
+        return _regenerator2.default.wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
                 methodName = 'updateBalances';
                 isAddress = { presence: true, isAddress: true };
@@ -1508,91 +1452,91 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(payments, isArray), methodName, 'payments');
 
                 if (sender) {
-                  _context10.next = 9;
+                  _context9.next = 9;
                   break;
                 }
 
-                _context10.next = 7;
+                _context9.next = 7;
                 return this.web3.eth.getAccounts();
 
               case 7:
-                accounts = _context10.sent;
+                accounts = _context9.sent;
 
                 sender = accounts[0];
 
               case 9:
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context10.next = 12;
+                _context9.next = 12;
                 return Promise.all(payments.map(function () {
-                  var _ref13 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(payment, idx) {
+                  var _ref12 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8(payment, idx) {
                     var updatedPayment;
-                    return _regenerator2.default.wrap(function _callee9$(_context9) {
+                    return _regenerator2.default.wrap(function _callee8$(_context8) {
                       while (1) {
-                        switch (_context9.prev = _context9.next) {
+                        switch (_context8.prev = _context8.next) {
                           case 0:
                             // generate payment
                             updatedPayment = void 0;
-                            _context9.t0 = PAYMENT_TYPES[payment.type];
-                            _context9.next = _context9.t0 === PAYMENT_TYPES.LEDGER ? 4 : _context9.t0 === PAYMENT_TYPES.VIRTUAL ? 8 : 12;
+                            _context8.t0 = PAYMENT_TYPES[payment.type];
+                            _context8.next = _context8.t0 === PAYMENT_TYPES.LEDGER ? 4 : _context8.t0 === PAYMENT_TYPES.VIRTUAL ? 8 : 12;
                             break;
 
                           case 4:
-                            _context9.next = 6;
-                            return _this3.channelUpdateHandler(payment, sender, idx);
+                            _context8.next = 6;
+                            return _this2.channelUpdateHandler(payment, sender, idx);
 
                           case 6:
-                            updatedPayment = _context9.sent;
-                            return _context9.abrupt('break', 13);
+                            updatedPayment = _context8.sent;
+                            return _context8.abrupt('break', 13);
 
                           case 8:
-                            _context9.next = 10;
-                            return _this3.threadUpdateHandler(payment, sender, idx);
+                            _context8.next = 10;
+                            return _this2.threadUpdateHandler(payment, sender, idx);
 
                           case 10:
-                            updatedPayment = _context9.sent;
-                            return _context9.abrupt('break', 13);
+                            updatedPayment = _context8.sent;
+                            return _context8.abrupt('break', 13);
 
                           case 12:
                             throw new ChannelUpdateError(methodName, 'Incorrect channel type specified. Must be CHANNEL, THREAD, or EXCHANGE. Type: ' + payment.type);
 
                           case 13:
                             updatedPayment.type = payment.type;
-                            return _context9.abrupt('return', updatedPayment);
+                            return _context8.abrupt('return', updatedPayment);
 
                           case 15:
                           case 'end':
-                            return _context9.stop();
+                            return _context8.stop();
                         }
                       }
-                    }, _callee9, _this3);
+                    }, _callee8, _this2);
                   }));
 
-                  return function (_x21, _x22) {
-                    return _ref13.apply(this, arguments);
+                  return function (_x19, _x20) {
+                    return _ref12.apply(this, arguments);
                   };
                 }()));
 
               case 12:
-                updatedPayments = _context10.sent;
-                _context10.next = 15;
+                updatedPayments = _context9.sent;
+                _context9.next = 15;
                 return this.networking.post('payments/', {
                   payments: updatedPayments
                 });
 
               case 15:
-                response = _context10.sent;
-                return _context10.abrupt('return', response.data);
+                response = _context9.sent;
+                return _context9.abrupt('return', response.data);
 
               case 17:
               case 'end':
-                return _context10.stop();
+                return _context9.stop();
             }
           }
-        }, _callee10, this);
+        }, _callee9, this);
       }));
 
-      function updateBalances(_x20) {
-        return _ref12.apply(this, arguments);
+      function updateBalances(_x18) {
+        return _ref11.apply(this, arguments);
       }
 
       return updateBalances;
@@ -1600,15 +1544,15 @@ var Connext = function () {
   }, {
     key: 'channelUpdateHandler',
     value: function () {
-      var _ref15 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(_ref14) {
-        var payment = _ref14.payment,
-            meta = _ref14.meta;
+      var _ref14 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10(_ref13) {
+        var payment = _ref13.payment,
+            meta = _ref13.meta;
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var nonceOffset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
         var methodName, isAddress, isHexStrict, isValidDepositObject, isValidMeta, isObj, accounts, balanceA, balanceB, channelId, channel, proposedEthBalance, proposedTokenBalance, sig, state;
-        return _regenerator2.default.wrap(function _callee11$(_context11) {
+        return _regenerator2.default.wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context11.prev = _context11.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
                 methodName = 'channelUpdateHandler';
                 isAddress = { presence: true, isAddress: true };
@@ -1616,6 +1560,132 @@ var Connext = function () {
                 isValidDepositObject = { presence: true, isValidDepositObject: true };
                 isValidMeta = { presence: true, isValidMeta: true };
                 isObj = { presence: true, isObj: true };
+
+                if (sender) {
+                  _context10.next = 11;
+                  break;
+                }
+
+                _context10.next = 9;
+                return this.web3.eth.getAccounts();
+
+              case 9:
+                accounts = _context10.sent;
+
+                sender = accounts[0];
+
+              case 11:
+                Connext.validatorsResponseToError(validate.single(payment, isObj), methodName, 'payment');
+                balanceA = payment.balanceA, balanceB = payment.balanceB, channelId = payment.channelId;
+                // validate inputs
+
+                Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
+                Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
+                Connext.validatorsResponseToError(validate.single(balanceA, isValidDepositObject), methodName, 'balanceA');
+                Connext.validatorsResponseToError(validate.single(balanceB, isValidDepositObject), methodName, 'balanceB');
+                // validate meta
+                Connext.validatorsResponseToError(validate.single(meta, isValidMeta), methodName, 'meta');
+                _context10.next = 20;
+                return this.getChannelById(channelId);
+
+              case 20:
+                channel = _context10.sent;
+
+                if (channel) {
+                  _context10.next = 23;
+                  break;
+                }
+
+                throw new ChannelUpdateError(methodName, 'Channel not found');
+
+              case 23:
+                if (!(CHANNEL_STATES[channel.state] !== 1 && CHANNEL_STATES[channel.state] !== 2)) {
+                  _context10.next = 25;
+                  break;
+                }
+
+                throw new ChannelUpdateError(methodName, 'Channel is in invalid state');
+
+              case 25:
+                if (!(channel.partyA.toLowerCase() !== sender.toLowerCase() && channel.partyI.toLowerCase() !== sender.toLowerCase())) {
+                  _context10.next = 27;
+                  break;
+                }
+
+                throw new ChannelUpdateError(methodName, 'Not your channel');
+
+              case 27:
+                proposedEthBalance = balanceA.ethDeposit && balanceB.ethDeposit && Web3.utils.toBN(balanceA.ethDeposit).add(balanceB.ethDeposit);
+                proposedTokenBalance = balanceA.tokenDeposit && balanceB.tokenDeposit && Web3.utils.toBN(balanceA.tokenDeposit).add(balanceB.tokenDeposit);
+
+                // generate signature
+
+                _context10.next = 31;
+                return this.createChannelStateUpdate({
+                  channelId: channelId,
+                  nonce: channel.nonce + 1 + (nonceOffset || 0),
+                  openVcs: channel.openVcs,
+                  vcRootHash: channel.vcRootHash,
+                  partyA: channel.partyA,
+                  partyI: channel.partyI,
+                  balanceA: balanceA,
+                  balanceI: balanceB,
+                  signer: sender
+                });
+
+              case 31:
+                sig = _context10.sent;
+
+                // return sig
+                state = {
+                  ethBalanceA: proposedEthBalance ? balanceA.ethDeposit.toString() : Web3.utils.toBN(channel.ethBalanceA).toString(),
+                  ethBalanceB: proposedEthBalance ? balanceB.ethDeposit.toString() : Web3.utils.toBN(channel.ethBalanceI).toString(),
+                  tokenBalanceA: proposedTokenBalance ? balanceA.tokenDeposit.toString() : Web3.utils.toBN(channel.tokenBalanceA).toString(),
+                  tokenBalanceB: proposedTokenBalance ? balanceB.tokenDeposit.toString() : Web3.utils.toBN(channel.tokenBalanceI).toString(),
+                  channelId: channelId,
+                  nonce: channel.nonce + 1 + (nonceOffset || 0),
+                  sig: sig
+                };
+                return _context10.abrupt('return', { payment: state, meta: meta });
+
+              case 34:
+              case 'end':
+                return _context10.stop();
+            }
+          }
+        }, _callee10, this);
+      }));
+
+      function channelUpdateHandler(_x23) {
+        return _ref14.apply(this, arguments);
+      }
+
+      return channelUpdateHandler;
+    }()
+
+    // handle thread state updates from updateBalances
+    // payment object contains fields balanceA and balanceB
+
+  }, {
+    key: 'threadUpdateHandler',
+    value: function () {
+      var _ref16 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(_ref15) {
+        var payment = _ref15.payment,
+            meta = _ref15.meta;
+        var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var nonceOffset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var methodName, isHexStrict, isValidDepositObject, isValidMeta, isObj, isAddress, accounts, channelId, balanceA, balanceB, thread, updateType, threadEthBalance, threadTokenBalance, proposedEthBalance, proposedTokenBalance, sig, state;
+        return _regenerator2.default.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                // validate params
+                methodName = 'threadUpdateHandler';
+                isHexStrict = { presence: true, isHexStrict: true };
+                isValidDepositObject = { presence: true, isValidDepositObject: true };
+                isValidMeta = { presence: true, isValidMeta: true };
+                isObj = { presence: true, isObj: true };
+                isAddress = { presence: true, isAddress: true };
 
                 if (sender) {
                   _context11.next = 11;
@@ -1632,132 +1702,6 @@ var Connext = function () {
 
               case 11:
                 Connext.validatorsResponseToError(validate.single(payment, isObj), methodName, 'payment');
-                balanceA = payment.balanceA, balanceB = payment.balanceB, channelId = payment.channelId;
-                // validate inputs
-
-                Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
-                Connext.validatorsResponseToError(validate.single(balanceA, isValidDepositObject), methodName, 'balanceA');
-                Connext.validatorsResponseToError(validate.single(balanceB, isValidDepositObject), methodName, 'balanceB');
-                // validate meta
-                Connext.validatorsResponseToError(validate.single(meta, isValidMeta), methodName, 'meta');
-                _context11.next = 20;
-                return this.getChannelById(channelId);
-
-              case 20:
-                channel = _context11.sent;
-
-                if (channel) {
-                  _context11.next = 23;
-                  break;
-                }
-
-                throw new ChannelUpdateError(methodName, 'Channel not found');
-
-              case 23:
-                if (!(CHANNEL_STATES[channel.state] !== 1 && CHANNEL_STATES[channel.state] !== 2)) {
-                  _context11.next = 25;
-                  break;
-                }
-
-                throw new ChannelUpdateError(methodName, 'Channel is in invalid state');
-
-              case 25:
-                if (!(channel.partyA.toLowerCase() !== sender.toLowerCase() && channel.partyI.toLowerCase() !== sender.toLowerCase())) {
-                  _context11.next = 27;
-                  break;
-                }
-
-                throw new ChannelUpdateError(methodName, 'Not your channel');
-
-              case 27:
-                proposedEthBalance = balanceA.ethDeposit && balanceB.ethDeposit && Web3.utils.toBN(balanceA.ethDeposit).add(balanceB.ethDeposit);
-                proposedTokenBalance = balanceA.tokenDeposit && balanceB.tokenDeposit && Web3.utils.toBN(balanceA.tokenDeposit).add(balanceB.tokenDeposit);
-
-                // generate signature
-
-                _context11.next = 31;
-                return this.createChannelStateUpdate({
-                  channelId: channelId,
-                  nonce: channel.nonce + 1 + (nonceOffset || 0),
-                  openVcs: channel.openVcs,
-                  vcRootHash: channel.vcRootHash,
-                  partyA: channel.partyA,
-                  partyI: channel.partyI,
-                  balanceA: balanceA,
-                  balanceI: balanceB,
-                  signer: sender
-                });
-
-              case 31:
-                sig = _context11.sent;
-
-                // return sig
-                state = {
-                  ethBalanceA: proposedEthBalance ? balanceA.ethDeposit.toString() : Web3.utils.toBN(channel.ethBalanceA).toString(),
-                  ethBalanceB: proposedEthBalance ? balanceB.ethDeposit.toString() : Web3.utils.toBN(channel.ethBalanceI).toString(),
-                  tokenBalanceA: proposedTokenBalance ? balanceA.tokenDeposit.toString() : Web3.utils.toBN(channel.tokenBalanceA).toString(),
-                  tokenBalanceB: proposedTokenBalance ? balanceB.tokenDeposit.toString() : Web3.utils.toBN(channel.tokenBalanceI).toString(),
-                  channelId: channelId,
-                  nonce: channel.nonce + 1 + (nonceOffset || 0),
-                  sig: sig
-                };
-                return _context11.abrupt('return', { payment: state, meta: meta });
-
-              case 34:
-              case 'end':
-                return _context11.stop();
-            }
-          }
-        }, _callee11, this);
-      }));
-
-      function channelUpdateHandler(_x25) {
-        return _ref15.apply(this, arguments);
-      }
-
-      return channelUpdateHandler;
-    }()
-
-    // handle thread state updates from updateBalances
-    // payment object contains fields balanceA and balanceB
-
-  }, {
-    key: 'threadUpdateHandler',
-    value: function () {
-      var _ref17 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee12(_ref16) {
-        var payment = _ref16.payment,
-            meta = _ref16.meta;
-        var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var nonceOffset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-        var methodName, isHexStrict, isValidDepositObject, isValidMeta, isObj, isAddress, accounts, channelId, balanceA, balanceB, thread, updateType, threadEthBalance, threadTokenBalance, proposedEthBalance, proposedTokenBalance, sig, state;
-        return _regenerator2.default.wrap(function _callee12$(_context12) {
-          while (1) {
-            switch (_context12.prev = _context12.next) {
-              case 0:
-                // validate params
-                methodName = 'threadUpdateHandler';
-                isHexStrict = { presence: true, isHexStrict: true };
-                isValidDepositObject = { presence: true, isValidDepositObject: true };
-                isValidMeta = { presence: true, isValidMeta: true };
-                isObj = { presence: true, isObj: true };
-                isAddress = { presence: true, isAddress: true };
-
-                if (sender) {
-                  _context12.next = 11;
-                  break;
-                }
-
-                _context12.next = 9;
-                return this.web3.eth.getAccounts();
-
-              case 9:
-                accounts = _context12.sent;
-
-                sender = accounts[0];
-
-              case 11:
-                Connext.validatorsResponseToError(validate.single(payment, isObj), methodName, 'payment');
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
                 channelId = payment.channelId, balanceA = payment.balanceA, balanceB = payment.balanceB;
 
@@ -1767,14 +1711,14 @@ var Connext = function () {
                 // validate meta
                 Connext.validatorsResponseToError(validate.single(meta, isValidMeta), methodName, 'meta');
                 // get the vc
-                _context12.next = 20;
+                _context11.next = 20;
                 return this.getThreadById(channelId);
 
               case 20:
-                thread = _context12.sent;
+                thread = _context11.sent;
 
                 if (thread) {
-                  _context12.next = 23;
+                  _context11.next = 23;
                   break;
                 }
 
@@ -1782,7 +1726,7 @@ var Connext = function () {
 
               case 23:
                 if (!(THREAD_STATES[thread.state] === 3)) {
-                  _context12.next = 25;
+                  _context11.next = 25;
                   break;
                 }
 
@@ -1790,7 +1734,7 @@ var Connext = function () {
 
               case 25:
                 if (!(sender.toLowerCase() !== thread.partyA.toLowerCase())) {
-                  _context12.next = 27;
+                  _context11.next = 27;
                   break;
                 }
 
@@ -1813,13 +1757,13 @@ var Connext = function () {
                 threadEthBalance = Web3.utils.toBN(thread.ethBalanceA).add(Web3.utils.toBN(thread.ethBalanceB));
                 threadTokenBalance = Web3.utils.toBN(thread.tokenBalanceA).add(Web3.utils.toBN(thread.tokenBalanceB));
                 proposedEthBalance = void 0, proposedTokenBalance = void 0;
-                _context12.t0 = CHANNEL_TYPES[updateType];
-                _context12.next = _context12.t0 === CHANNEL_TYPES.ETH ? 35 : _context12.t0 === CHANNEL_TYPES.TOKEN ? 39 : _context12.t0 === CHANNEL_TYPES.TOKEN_ETH ? 43 : 50;
+                _context11.t0 = CHANNEL_TYPES[updateType];
+                _context11.next = _context11.t0 === CHANNEL_TYPES.ETH ? 35 : _context11.t0 === CHANNEL_TYPES.TOKEN ? 39 : _context11.t0 === CHANNEL_TYPES.TOKEN_ETH ? 43 : 50;
                 break;
 
               case 35:
                 if (!balanceB.ethDeposit.lte(Web3.utils.toBN(thread.ethBalanceB))) {
-                  _context12.next = 37;
+                  _context11.next = 37;
                   break;
                 }
 
@@ -1827,11 +1771,11 @@ var Connext = function () {
 
               case 37:
                 proposedEthBalance = Web3.utils.toBN(balanceA.ethDeposit).add(balanceB.ethDeposit); // proposed balance
-                return _context12.abrupt('break', 51);
+                return _context11.abrupt('break', 51);
 
               case 39:
                 if (!balanceB.tokenDeposit.lte(Web3.utils.toBN(thread.tokenBalanceB))) {
-                  _context12.next = 41;
+                  _context11.next = 41;
                   break;
                 }
 
@@ -1839,11 +1783,11 @@ var Connext = function () {
 
               case 41:
                 proposedTokenBalance = Web3.utils.toBN(balanceA.tokenDeposit).add(balanceB.tokenDeposit);
-                return _context12.abrupt('break', 51);
+                return _context11.abrupt('break', 51);
 
               case 43:
                 if (!balanceB.ethDeposit.lte(Web3.utils.toBN(thread.ethBalanceB))) {
-                  _context12.next = 45;
+                  _context11.next = 45;
                   break;
                 }
 
@@ -1851,7 +1795,7 @@ var Connext = function () {
 
               case 45:
                 if (!balanceB.tokenDeposit.lte(Web3.utils.toBN(thread.tokenBalanceB))) {
-                  _context12.next = 47;
+                  _context11.next = 47;
                   break;
                 }
 
@@ -1860,14 +1804,14 @@ var Connext = function () {
               case 47:
                 proposedEthBalance = Web3.utils.toBN(balanceA.ethDeposit).add(balanceB.ethDeposit);
                 proposedTokenBalance = Web3.utils.toBN(balanceA.tokenDeposit).add(balanceB.tokenDeposit);
-                return _context12.abrupt('break', 51);
+                return _context11.abrupt('break', 51);
 
               case 50:
                 throw new ThreadUpdateError(methodName, 'Error determining thread deposit types.');
 
               case 51:
                 if (!(proposedEthBalance && !proposedEthBalance.eq(threadEthBalance))) {
-                  _context12.next = 53;
+                  _context11.next = 53;
                   break;
                 }
 
@@ -1875,14 +1819,14 @@ var Connext = function () {
 
               case 53:
                 if (!(proposedTokenBalance && !proposedTokenBalance.eq(threadTokenBalance))) {
-                  _context12.next = 55;
+                  _context11.next = 55;
                   break;
                 }
 
                 throw new ThreadUpdateError(methodName, 'Thread token balance cannot change');
 
               case 55:
-                _context12.next = 57;
+                _context11.next = 57;
                 return this.createThreadStateUpdate({
                   channelId: channelId,
                   nonce: thread.nonce + 1 + (nonceOffset || 0),
@@ -1895,7 +1839,7 @@ var Connext = function () {
                 });
 
               case 57:
-                sig = _context12.sent;
+                sig = _context11.sent;
 
                 // return sig
                 state = {
@@ -1910,18 +1854,18 @@ var Connext = function () {
                   nonce: thread.nonce + 1 + (nonceOffset || 0),
                   sig: sig
                 };
-                return _context12.abrupt('return', { payment: state, meta: meta });
+                return _context11.abrupt('return', { payment: state, meta: meta });
 
               case 60:
               case 'end':
-                return _context12.stop();
+                return _context11.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee11, this);
       }));
 
-      function threadUpdateHandler(_x28) {
-        return _ref17.apply(this, arguments);
+      function threadUpdateHandler(_x26) {
+        return _ref16.apply(this, arguments);
       }
 
       return threadUpdateHandler;
@@ -1950,12 +1894,12 @@ var Connext = function () {
   }, {
     key: 'closeThread',
     value: function () {
-      var _ref18 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee13(threadId) {
+      var _ref17 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee12(threadId) {
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isHexStrict, isAddress, accounts, thread, latestThreadState, signer, subchan, updateAtoI, sigAtoI, fastCloseSig;
-        return _regenerator2.default.wrap(function _callee13$(_context13) {
+        return _regenerator2.default.wrap(function _callee12$(_context12) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context12.prev = _context12.next) {
               case 0:
                 // validate params
                 methodName = 'closeThread';
@@ -1965,32 +1909,32 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(threadId, isHexStrict), methodName, 'threadId');
 
                 if (!sender) {
-                  _context13.next = 8;
+                  _context12.next = 8;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context13.next = 12;
+                _context12.next = 12;
                 break;
 
               case 8:
-                _context13.next = 10;
+                _context12.next = 10;
                 return this.web3.eth.getAccounts();
 
               case 10:
-                accounts = _context13.sent;
+                accounts = _context12.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 12:
-                _context13.next = 14;
+                _context12.next = 14;
                 return this.getThreadById(threadId);
 
               case 14:
-                thread = _context13.sent;
+                thread = _context12.sent;
 
                 if (thread) {
-                  _context13.next = 17;
+                  _context12.next = 17;
                   break;
                 }
 
@@ -1998,18 +1942,18 @@ var Connext = function () {
 
               case 17:
                 if (!(THREAD_STATES[thread.state] !== THREAD_STATES.VCS_OPENING && THREAD_STATES[thread.state] !== THREAD_STATES.VCS_OPENED)) {
-                  _context13.next = 19;
+                  _context12.next = 19;
                   break;
                 }
 
                 throw new ThreadCloseError(methodName, 'Thread is in invalid state');
 
               case 19:
-                _context13.next = 21;
+                _context12.next = 21;
                 return this.getLatestThreadState(threadId);
 
               case 21:
-                latestThreadState = _context13.sent;
+                latestThreadState = _context12.sent;
 
                 // verify latestThreadState was signed by agentA
                 signer = Connext.recoverSignerFromThreadStateUpdate({
@@ -2025,7 +1969,7 @@ var Connext = function () {
                 });
 
                 if (!(signer.toLowerCase() !== thread.partyA.toLowerCase())) {
-                  _context13.next = 25;
+                  _context12.next = 25;
                   break;
                 }
 
@@ -2037,22 +1981,22 @@ var Connext = function () {
                 latestThreadState.partyA = thread.partyA;
                 latestThreadState.partyB = thread.partyB;
                 // get partyA ledger channel
-                _context13.next = 30;
+                _context12.next = 30;
                 return this.getChannelByPartyA(sender);
 
               case 30:
-                subchan = _context13.sent;
-                _context13.next = 33;
+                subchan = _context12.sent;
+                _context12.next = 33;
                 return this.createChannelStateOnThreadClose({ latestThreadState: latestThreadState, subchan: subchan, signer: sender.toLowerCase() });
 
               case 33:
-                updateAtoI = _context13.sent;
-                _context13.next = 36;
+                updateAtoI = _context12.sent;
+                _context12.next = 36;
                 return this.createChannelStateUpdate(updateAtoI);
 
               case 36:
-                sigAtoI = _context13.sent;
-                _context13.next = 39;
+                sigAtoI = _context12.sent;
+                _context12.next = 39;
                 return this.fastCloseThreadHandler({
                   sig: sigAtoI,
                   signer: sender.toLowerCase(),
@@ -2060,28 +2004,28 @@ var Connext = function () {
                 });
 
               case 39:
-                fastCloseSig = _context13.sent;
+                fastCloseSig = _context12.sent;
 
                 if (fastCloseSig) {
-                  _context13.next = 42;
+                  _context12.next = 42;
                   break;
                 }
 
                 throw new ThreadCloseError(methodName, 651, 'Hub did not cosign proposed channel update, call initThread and settleThread');
 
               case 42:
-                return _context13.abrupt('return', fastCloseSig);
+                return _context12.abrupt('return', fastCloseSig);
 
               case 43:
               case 'end':
-                return _context13.stop();
+                return _context12.stop();
             }
           }
-        }, _callee13, this);
+        }, _callee12, this);
       }));
 
-      function closeThread(_x30) {
-        return _ref18.apply(this, arguments);
+      function closeThread(_x28) {
+        return _ref17.apply(this, arguments);
       }
 
       return closeThread;
@@ -2102,16 +2046,16 @@ var Connext = function () {
   }, {
     key: 'closeThreads',
     value: function () {
-      var _ref19 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee14(channelIds) {
-        var _this4 = this;
+      var _ref18 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee13(channelIds) {
+        var _this3 = this;
 
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-        var methodName, isArray, isAddress, accounts, fnMap, results, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _ref20, _ref21, parameters, fn, result;
+        var methodName, isArray, isAddress, accounts, fnMap, results, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _ref19, _ref20, parameters, fn, result;
 
-        return _regenerator2.default.wrap(function _callee14$(_context14) {
+        return _regenerator2.default.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
                 methodName = 'closeThreads';
                 isArray = { presence: true, isArray: true };
@@ -2120,15 +2064,15 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(channelIds, isArray), methodName, 'channels');
 
                 if (sender) {
-                  _context14.next = 9;
+                  _context13.next = 9;
                   break;
                 }
 
-                _context14.next = 7;
+                _context13.next = 7;
                 return this.web3.eth.getAccounts();
 
               case 7:
-                accounts = _context14.sent;
+                accounts = _context13.sent;
 
                 sender = accounts[0];
 
@@ -2139,98 +2083,98 @@ var Connext = function () {
                 fnMap = new Map();
 
                 channelIds.map(function (channelId) {
-                  return fnMap.set([channelId, sender], _this4.closeThread);
+                  return fnMap.set([channelId, sender], _this3.closeThread);
                 });
                 results = [];
                 _iteratorNormalCompletion3 = true;
                 _didIteratorError3 = false;
                 _iteratorError3 = undefined;
-                _context14.prev = 16;
+                _context13.prev = 16;
                 _iterator3 = fnMap.entries()[Symbol.iterator]();
 
               case 18:
                 if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                  _context14.next = 39;
+                  _context13.next = 39;
                   break;
                 }
 
-                _ref20 = _step3.value;
-                _ref21 = (0, _slicedToArray3.default)(_ref20, 2);
-                parameters = _ref21[0];
-                fn = _ref21[1];
-                _context14.prev = 23;
+                _ref19 = _step3.value;
+                _ref20 = (0, _slicedToArray3.default)(_ref19, 2);
+                parameters = _ref20[0];
+                fn = _ref20[1];
+                _context13.prev = 23;
 
                 console.log('Closing channel: ' + parameters[0] + '...');
-                _context14.next = 27;
+                _context13.next = 27;
                 return fn.apply(this, parameters);
 
               case 27:
-                result = _context14.sent;
+                result = _context13.sent;
 
                 results.push(result);
                 console.log('Channel closed.');
-                _context14.next = 36;
+                _context13.next = 36;
                 break;
 
               case 32:
-                _context14.prev = 32;
-                _context14.t0 = _context14['catch'](23);
+                _context13.prev = 32;
+                _context13.t0 = _context13['catch'](23);
 
                 console.log('Error closing channel.');
-                results.push(new ThreadCloseError(methodName, _context14.t0.message));
+                results.push(new ThreadCloseError(methodName, _context13.t0.message));
 
               case 36:
                 _iteratorNormalCompletion3 = true;
-                _context14.next = 18;
+                _context13.next = 18;
                 break;
 
               case 39:
-                _context14.next = 45;
+                _context13.next = 45;
                 break;
 
               case 41:
-                _context14.prev = 41;
-                _context14.t1 = _context14['catch'](16);
+                _context13.prev = 41;
+                _context13.t1 = _context13['catch'](16);
                 _didIteratorError3 = true;
-                _iteratorError3 = _context14.t1;
+                _iteratorError3 = _context13.t1;
 
               case 45:
-                _context14.prev = 45;
-                _context14.prev = 46;
+                _context13.prev = 45;
+                _context13.prev = 46;
 
                 if (!_iteratorNormalCompletion3 && _iterator3.return) {
                   _iterator3.return();
                 }
 
               case 48:
-                _context14.prev = 48;
+                _context13.prev = 48;
 
                 if (!_didIteratorError3) {
-                  _context14.next = 51;
+                  _context13.next = 51;
                   break;
                 }
 
                 throw _iteratorError3;
 
               case 51:
-                return _context14.finish(48);
+                return _context13.finish(48);
 
               case 52:
-                return _context14.finish(45);
+                return _context13.finish(45);
 
               case 53:
-                return _context14.abrupt('return', results);
+                return _context13.abrupt('return', results);
 
               case 54:
               case 'end':
-                return _context14.stop();
+                return _context13.stop();
             }
           }
-        }, _callee14, this, [[16, 41, 45, 53], [23, 32], [46,, 48, 52]]);
+        }, _callee13, this, [[16, 41, 45, 53], [23, 32], [46,, 48, 52]]);
       }));
 
-      function closeThreads(_x32) {
-        return _ref19.apply(this, arguments);
+      function closeThreads(_x30) {
+        return _ref18.apply(this, arguments);
       }
 
       return closeThreads;
@@ -2256,43 +2200,43 @@ var Connext = function () {
   }, {
     key: 'closeChannel',
     value: function () {
-      var _ref22 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee15() {
+      var _ref21 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee14() {
         var sender = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var methodName, isAddress, accounts, channel, channelState, finalState, sig, cosigned, response;
-        return _regenerator2.default.wrap(function _callee15$(_context15) {
+        return _regenerator2.default.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context15.prev = _context15.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
                 methodName = 'closeChannel';
                 isAddress = { presence: true, isAddress: true };
 
                 if (!sender) {
-                  _context15.next = 6;
+                  _context14.next = 6;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context15.next = 10;
+                _context14.next = 10;
                 break;
 
               case 6:
-                _context15.next = 8;
+                _context14.next = 8;
                 return this.web3.eth.getAccounts();
 
               case 8:
-                accounts = _context15.sent;
+                accounts = _context14.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 10:
-                _context15.next = 12;
+                _context14.next = 12;
                 return this.getChannelByPartyA(sender.toLowerCase());
 
               case 12:
-                channel = _context15.sent;
+                channel = _context14.sent;
 
                 if (!(CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENED)) {
-                  _context15.next = 15;
+                  _context14.next = 15;
                   break;
                 }
 
@@ -2300,18 +2244,18 @@ var Connext = function () {
 
               case 15:
                 if (!(sender.toLowerCase() !== channel.partyA && sender.toLowerCase() !== channel.partyI)) {
-                  _context15.next = 17;
+                  _context14.next = 17;
                   break;
                 }
 
                 throw new ChannelCloseError(methodName, 'Not your channel');
 
               case 17:
-                _context15.next = 19;
+                _context14.next = 19;
                 return this.getLatestChannelState(channel.channelId, ['sigI']);
 
               case 19:
-                channelState = _context15.sent;
+                channelState = _context14.sent;
 
                 // transform if needed
                 if (!channelState.balanceA || !channelState.balanceI) {
@@ -2326,34 +2270,34 @@ var Connext = function () {
                 }
 
                 // channelState.channelId = channel.channelId
-                _context15.next = 23;
+                _context14.next = 23;
                 return this.createCloseChannelState(channelState, sender);
 
               case 23:
-                finalState = _context15.sent;
-                _context15.next = 26;
+                finalState = _context14.sent;
+                _context14.next = 26;
                 return this.createChannelStateUpdate(finalState, sender);
 
               case 26:
-                sig = _context15.sent;
-                _context15.next = 29;
+                sig = _context14.sent;
+                _context14.next = 29;
                 return this.fastCloseChannelHandler({
                   sig: sig,
                   channelId: channel.channelId
                 });
 
               case 29:
-                cosigned = _context15.sent;
+                cosigned = _context14.sent;
 
                 if (cosigned.sigI) {
-                  _context15.next = 32;
+                  _context14.next = 32;
                   break;
                 }
 
                 throw new ChannelCloseError(methodName, 601, 'Hub did not countersign proposed update, channel could not be fast closed.');
 
               case 32:
-                _context15.next = 34;
+                _context14.next = 34;
                 return this.consensusCloseChannelContractHandler({
                   channelId: channel.channelId,
                   nonce: finalState.nonce,
@@ -2365,19 +2309,19 @@ var Connext = function () {
                 });
 
               case 34:
-                response = _context15.sent;
-                return _context15.abrupt('return', response.transactionHash);
+                response = _context14.sent;
+                return _context14.abrupt('return', response.transactionHash);
 
               case 36:
               case 'end':
-                return _context15.stop();
+                return _context14.stop();
             }
           }
-        }, _callee15, this);
+        }, _callee14, this);
       }));
 
       function closeChannel() {
-        return _ref22.apply(this, arguments);
+        return _ref21.apply(this, arguments);
       }
 
       return closeChannel;
@@ -2407,60 +2351,60 @@ var Connext = function () {
   }, {
     key: 'withdraw',
     value: function () {
-      var _ref23 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee16() {
+      var _ref22 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee15() {
         var sender = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var methodName, isAddress, accounts, lc, results;
-        return _regenerator2.default.wrap(function _callee16$(_context16) {
+        return _regenerator2.default.wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context16.prev = _context16.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
                 methodName = 'withdraw';
                 isAddress = { presence: true, isAddress: true };
 
                 if (!sender) {
-                  _context16.next = 6;
+                  _context15.next = 6;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context16.next = 10;
+                _context15.next = 10;
                 break;
 
               case 6:
-                _context16.next = 8;
+                _context15.next = 8;
                 return this.web3.eth.getAccounts();
 
               case 8:
-                accounts = _context16.sent;
+                accounts = _context15.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 10:
-                _context16.next = 12;
+                _context15.next = 12;
                 return this.getChannelByPartyA(sender);
 
               case 12:
-                lc = _context16.sent;
-                _context16.next = 15;
+                lc = _context15.sent;
+                _context15.next = 15;
                 return this.byzantineCloseThreadContractHandler({
                   lcId: lc.channelId,
                   sender: sender
                 });
 
               case 15:
-                results = _context16.sent;
-                return _context16.abrupt('return', results);
+                results = _context15.sent;
+                return _context15.abrupt('return', results);
 
               case 17:
               case 'end':
-                return _context16.stop();
+                return _context15.stop();
             }
           }
-        }, _callee16, this);
+        }, _callee15, this);
       }));
 
       function withdraw() {
-        return _ref23.apply(this, arguments);
+        return _ref22.apply(this, arguments);
       }
 
       return withdraw;
@@ -2481,12 +2425,12 @@ var Connext = function () {
   }, {
     key: 'cosignLatestChannelUpdate',
     value: function () {
-      var _ref24 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee17(channelId) {
+      var _ref23 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee16(channelId) {
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isHexStrict, accounts, channel, latestState, result;
-        return _regenerator2.default.wrap(function _callee17$(_context17) {
+        return _regenerator2.default.wrap(function _callee16$(_context16) {
           while (1) {
-            switch (_context17.prev = _context17.next) {
+            switch (_context16.prev = _context16.next) {
               case 0:
                 methodName = 'cosignLatestChannelUpdate';
                 isHexStrict = { presence: true, isHexStrict: true };
@@ -2494,32 +2438,32 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
 
                 if (!sender) {
-                  _context17.next = 7;
+                  _context16.next = 7;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context17.next = 11;
+                _context16.next = 11;
                 break;
 
               case 7:
-                _context17.next = 9;
+                _context16.next = 9;
                 return this.web3.eth.getAccounts();
 
               case 9:
-                accounts = _context17.sent;
+                accounts = _context16.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 11:
-                _context17.next = 13;
+                _context16.next = 13;
                 return this.getChannelById(channelId);
 
               case 13:
-                channel = _context17.sent;
+                channel = _context16.sent;
 
                 if (!(channel == null)) {
-                  _context17.next = 16;
+                  _context16.next = 16;
                   break;
                 }
 
@@ -2527,7 +2471,7 @@ var Connext = function () {
 
               case 16:
                 if (!(channel.partyA !== sender.toLowerCase())) {
-                  _context17.next = 18;
+                  _context16.next = 18;
                   break;
                 }
 
@@ -2535,19 +2479,19 @@ var Connext = function () {
 
               case 18:
                 if (!(CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENED)) {
-                  _context17.next = 20;
+                  _context16.next = 20;
                   break;
                 }
 
                 throw new ChannelUpdateError(methodName, 'Channel is in invalid state');
 
               case 20:
-                _context17.next = 22;
+                _context16.next = 22;
                 return this.getLatestChannelState(lcId, ['sigI']);
 
               case 22:
-                latestState = _context17.sent;
-                _context17.next = 25;
+                latestState = _context16.sent;
+                _context16.next = 25;
                 return this.cosignChannelUpdate({
                   channelId: channelId,
                   nonce: latestState.nonce,
@@ -2555,19 +2499,19 @@ var Connext = function () {
                 });
 
               case 25:
-                result = _context17.sent;
-                return _context17.abrupt('return', result);
+                result = _context16.sent;
+                return _context16.abrupt('return', result);
 
               case 27:
               case 'end':
-                return _context17.stop();
+                return _context16.stop();
             }
           }
-        }, _callee17, this);
+        }, _callee16, this);
       }));
 
-      function cosignLatestChannelUpdate(_x36) {
-        return _ref24.apply(this, arguments);
+      function cosignLatestChannelUpdate(_x34) {
+        return _ref23.apply(this, arguments);
       }
 
       return cosignLatestChannelUpdate;
@@ -2589,15 +2533,15 @@ var Connext = function () {
   }, {
     key: 'cosignChannelUpdate',
     value: function () {
-      var _ref26 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee18(_ref25) {
-        var channelId = _ref25.channelId,
-            nonce = _ref25.nonce,
-            _ref25$sender = _ref25.sender,
-            sender = _ref25$sender === undefined ? null : _ref25$sender;
+      var _ref25 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee17(_ref24) {
+        var channelId = _ref24.channelId,
+            nonce = _ref24.nonce,
+            _ref24$sender = _ref24.sender,
+            sender = _ref24$sender === undefined ? null : _ref24$sender;
         var methodName, isHexStrict, isPositiveInt, accounts, channel, state, signer, sigA, response;
-        return _regenerator2.default.wrap(function _callee18$(_context18) {
+        return _regenerator2.default.wrap(function _callee17$(_context17) {
           while (1) {
-            switch (_context18.prev = _context18.next) {
+            switch (_context17.prev = _context17.next) {
               case 0:
                 methodName = 'cosignChannelUpdate';
                 isHexStrict = { presence: true, isHexStrict: true };
@@ -2607,32 +2551,32 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(nonce, isPositiveInt), methodName, 'nonce');
 
                 if (!sender) {
-                  _context18.next = 9;
+                  _context17.next = 9;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context18.next = 13;
+                _context17.next = 13;
                 break;
 
               case 9:
-                _context18.next = 11;
+                _context17.next = 11;
                 return this.web3.eth.getAccounts();
 
               case 11:
-                accounts = _context18.sent;
+                accounts = _context17.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 13:
-                _context18.next = 15;
+                _context17.next = 15;
                 return this.getChannelById(channelId);
 
               case 15:
-                channel = _context18.sent;
+                channel = _context17.sent;
 
                 if (!(channel == null)) {
-                  _context18.next = 18;
+                  _context17.next = 18;
                   break;
                 }
 
@@ -2640,7 +2584,7 @@ var Connext = function () {
 
               case 18:
                 if (!(channel.partyA !== sender.toLowerCase())) {
-                  _context18.next = 20;
+                  _context17.next = 20;
                   break;
                 }
 
@@ -2648,7 +2592,7 @@ var Connext = function () {
 
               case 20:
                 if (!(CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENED)) {
-                  _context18.next = 22;
+                  _context17.next = 22;
                   break;
                 }
 
@@ -2656,18 +2600,18 @@ var Connext = function () {
 
               case 22:
                 if (!(nonce > channel.nonce)) {
-                  _context18.next = 24;
+                  _context17.next = 24;
                   break;
                 }
 
                 throw new ChannelUpdateError(methodName, 'Invalid nonce detected');
 
               case 24:
-                _context18.next = 26;
+                _context17.next = 26;
                 return this.getChannelStateByNonce({ channelId: channelId, nonce: nonce });
 
               case 26:
-                state = _context18.sent;
+                state = _context17.sent;
 
 
                 // verify sigI
@@ -2687,7 +2631,7 @@ var Connext = function () {
                 });
 
                 if (!(signer.toLowerCase() !== this.ingridAddress.toLowerCase())) {
-                  _context18.next = 30;
+                  _context17.next = 30;
                   break;
                 }
 
@@ -2697,30 +2641,30 @@ var Connext = function () {
 
                 state.signer = state.partyA;
                 state.channelId = channelId;
-                _context18.next = 34;
+                _context17.next = 34;
                 return this.createChannelStateUpdate(state);
 
               case 34:
-                sigA = _context18.sent;
-                _context18.next = 37;
+                sigA = _context17.sent;
+                _context17.next = 37;
                 return this.networking.post('ledgerchannel/' + channelId + '/update/' + nonce + '/cosign', {
                   sig: sigA
                 });
 
               case 37:
-                response = _context18.sent;
-                return _context18.abrupt('return', response.data);
+                response = _context17.sent;
+                return _context17.abrupt('return', response.data);
 
               case 39:
               case 'end':
-                return _context18.stop();
+                return _context17.stop();
             }
           }
-        }, _callee18, this);
+        }, _callee17, this);
       }));
 
-      function cosignChannelUpdate(_x37) {
-        return _ref26.apply(this, arguments);
+      function cosignChannelUpdate(_x35) {
+        return _ref25.apply(this, arguments);
       }
 
       return cosignChannelUpdate;
@@ -2762,30 +2706,30 @@ var Connext = function () {
     //  * @returns {String} signature of signer on data provided
     //  */
     value: function () {
-      var _ref28 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee19(_ref27) {
-        var _ref27$isClose = _ref27.isClose,
-            isClose = _ref27$isClose === undefined ? false : _ref27$isClose,
-            channelId = _ref27.channelId,
-            nonce = _ref27.nonce,
-            openVcs = _ref27.openVcs,
-            vcRootHash = _ref27.vcRootHash,
-            partyA = _ref27.partyA,
-            _ref27$partyI = _ref27.partyI,
-            partyI = _ref27$partyI === undefined ? this.ingridAddress : _ref27$partyI,
-            balanceA = _ref27.balanceA,
-            balanceI = _ref27.balanceI,
-            _ref27$unlockedAccoun = _ref27.unlockedAccountPresent,
-            unlockedAccountPresent = _ref27$unlockedAccoun === undefined ? process.env.DEV ? process.env.DEV : false : _ref27$unlockedAccoun,
-            _ref27$signer = _ref27.signer,
-            signer = _ref27$signer === undefined ? null : _ref27$signer,
-            _ref27$hubBond = _ref27.hubBond,
-            hubBond = _ref27$hubBond === undefined ? null : _ref27$hubBond,
-            _ref27$deposit = _ref27.deposit,
-            deposit = _ref27$deposit === undefined ? null : _ref27$deposit;
+      var _ref27 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee18(_ref26) {
+        var _ref26$isClose = _ref26.isClose,
+            isClose = _ref26$isClose === undefined ? false : _ref26$isClose,
+            channelId = _ref26.channelId,
+            nonce = _ref26.nonce,
+            openVcs = _ref26.openVcs,
+            vcRootHash = _ref26.vcRootHash,
+            partyA = _ref26.partyA,
+            _ref26$partyI = _ref26.partyI,
+            partyI = _ref26$partyI === undefined ? this.ingridAddress : _ref26$partyI,
+            balanceA = _ref26.balanceA,
+            balanceI = _ref26.balanceI,
+            _ref26$unlockedAccoun = _ref26.unlockedAccountPresent,
+            unlockedAccountPresent = _ref26$unlockedAccoun === undefined ? process.env.DEV ? process.env.DEV : false : _ref26$unlockedAccoun,
+            _ref26$signer = _ref26.signer,
+            signer = _ref26$signer === undefined ? null : _ref26$signer,
+            _ref26$hubBond = _ref26.hubBond,
+            hubBond = _ref26$hubBond === undefined ? null : _ref26$hubBond,
+            _ref26$deposit = _ref26.deposit,
+            deposit = _ref26$deposit === undefined ? null : _ref26$deposit;
         var methodName, isHexStrict, isHex, isBN, isAddress, isPositiveInt, isBool, isValidDepositObject, accounts, emptyRootHash, channel, proposedEthBalance, proposedTokenBalance, isOpeningVc, ethChannelBalance, tokenChannelBalance, hash, sig;
-        return _regenerator2.default.wrap(function _callee19$(_context19) {
+        return _regenerator2.default.wrap(function _callee18$(_context18) {
           while (1) {
-            switch (_context19.prev = _context19.next) {
+            switch (_context18.prev = _context18.next) {
               case 0:
                 methodName = 'createChannelStateUpdate';
                 // validate
@@ -2833,26 +2777,26 @@ var Connext = function () {
                 }
 
                 if (!signer) {
-                  _context19.next = 23;
+                  _context18.next = 23;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(signer, isAddress), methodName, 'signer');
-                _context19.next = 27;
+                _context18.next = 27;
                 break;
 
               case 23:
-                _context19.next = 25;
+                _context18.next = 25;
                 return this.web3.eth.getAccounts();
 
               case 25:
-                accounts = _context19.sent;
+                accounts = _context18.sent;
 
                 signer = accounts[0].toLowerCase();
 
               case 27:
                 if (!(signer.toLowerCase() !== partyA.toLowerCase() && signer.toLowerCase() !== partyI.toLowerCase())) {
-                  _context19.next = 29;
+                  _context18.next = 29;
                   break;
                 }
 
@@ -2862,15 +2806,15 @@ var Connext = function () {
 
                 // validate update
                 emptyRootHash = Connext.generateThreadRootHash({ threadInitialStates: [] });
-                _context19.next = 32;
+                _context18.next = 32;
                 return this.getChannelById(channelId);
 
               case 32:
-                channel = _context19.sent;
+                channel = _context18.sent;
                 proposedEthBalance = void 0, proposedTokenBalance = void 0;
 
                 if (!(channel == null)) {
-                  _context19.next = 51;
+                  _context18.next = 51;
                   break;
                 }
 
@@ -2882,7 +2826,7 @@ var Connext = function () {
                 // generating opening cert
 
                 if (!(nonce !== 0)) {
-                  _context19.next = 41;
+                  _context18.next = 41;
                   break;
                 }
 
@@ -2890,7 +2834,7 @@ var Connext = function () {
 
               case 41:
                 if (!(openVcs !== 0)) {
-                  _context19.next = 43;
+                  _context18.next = 43;
                   break;
                 }
 
@@ -2898,7 +2842,7 @@ var Connext = function () {
 
               case 43:
                 if (!(vcRootHash !== emptyRootHash)) {
-                  _context19.next = 45;
+                  _context18.next = 45;
                   break;
                 }
 
@@ -2906,7 +2850,7 @@ var Connext = function () {
 
               case 45:
                 if (!(partyA === partyI)) {
-                  _context19.next = 47;
+                  _context18.next = 47;
                   break;
                 }
 
@@ -2921,12 +2865,12 @@ var Connext = function () {
                   // channel includes token
                   proposedTokenBalance = balanceA.tokenDeposit.add(balanceI.tokenDeposit);
                 }
-                _context19.next = 64;
+                _context18.next = 64;
                 break;
 
               case 51:
                 if (!(CHANNEL_STATES[channel.state] === 3)) {
-                  _context19.next = 53;
+                  _context18.next = 53;
                   break;
                 }
 
@@ -2934,7 +2878,7 @@ var Connext = function () {
 
               case 53:
                 if (!(nonce < channel.nonce)) {
-                  _context19.next = 55;
+                  _context18.next = 55;
                   break;
                 }
 
@@ -2942,7 +2886,7 @@ var Connext = function () {
 
               case 55:
                 if (!(Math.abs(Number(openVcs) - Number(channel.openVcs)) !== 1 && Math.abs(Number(openVcs) - Number(channel.openVcs)) !== 0)) {
-                  _context19.next = 57;
+                  _context18.next = 57;
                   break;
                 }
 
@@ -2950,7 +2894,7 @@ var Connext = function () {
 
               case 57:
                 if (!(partyA.toLowerCase() !== channel.partyA.toLowerCase() || partyI.toLowerCase() !== channel.partyI.toLowerCase())) {
-                  _context19.next = 59;
+                  _context18.next = 59;
                   break;
                 }
 
@@ -3005,39 +2949,39 @@ var Connext = function () {
                 sig = void 0;
 
                 if (!unlockedAccountPresent) {
-                  _context19.next = 73;
+                  _context18.next = 73;
                   break;
                 }
 
-                _context19.next = 70;
+                _context18.next = 70;
                 return this.web3.eth.sign(hash, signer);
 
               case 70:
-                sig = _context19.sent;
-                _context19.next = 76;
+                sig = _context18.sent;
+                _context18.next = 76;
                 break;
 
               case 73:
-                _context19.next = 75;
+                _context18.next = 75;
                 return this.web3.eth.personal.sign(hash, signer);
 
               case 75:
-                sig = _context19.sent;
+                sig = _context18.sent;
 
               case 76:
                 console.log('sig:', sig);
-                return _context19.abrupt('return', sig);
+                return _context18.abrupt('return', sig);
 
               case 78:
               case 'end':
-                return _context19.stop();
+                return _context18.stop();
             }
           }
-        }, _callee19, this);
+        }, _callee18, this);
       }));
 
-      function createChannelStateUpdate(_x38) {
-        return _ref28.apply(this, arguments);
+      function createChannelStateUpdate(_x36) {
+        return _ref27.apply(this, arguments);
       }
 
       return createChannelStateUpdate;
@@ -3061,22 +3005,22 @@ var Connext = function () {
   }, {
     key: 'createThreadStateUpdate',
     value: function () {
-      var _ref30 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee20(_ref29) {
-        var channelId = _ref29.channelId,
-            nonce = _ref29.nonce,
-            partyA = _ref29.partyA,
-            partyB = _ref29.partyB,
-            balanceA = _ref29.balanceA,
-            balanceB = _ref29.balanceB,
-            updateType = _ref29.updateType,
-            _ref29$unlockedAccoun = _ref29.unlockedAccountPresent,
-            unlockedAccountPresent = _ref29$unlockedAccoun === undefined ? process.env.DEV ? process.env.DEV : false : _ref29$unlockedAccoun,
-            _ref29$signer = _ref29.signer,
-            signer = _ref29$signer === undefined ? null : _ref29$signer;
+      var _ref29 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee19(_ref28) {
+        var channelId = _ref28.channelId,
+            nonce = _ref28.nonce,
+            partyA = _ref28.partyA,
+            partyB = _ref28.partyB,
+            balanceA = _ref28.balanceA,
+            balanceB = _ref28.balanceB,
+            updateType = _ref28.updateType,
+            _ref28$unlockedAccoun = _ref28.unlockedAccountPresent,
+            unlockedAccountPresent = _ref28$unlockedAccoun === undefined ? process.env.DEV ? process.env.DEV : false : _ref28$unlockedAccoun,
+            _ref28$signer = _ref28.signer,
+            signer = _ref28$signer === undefined ? null : _ref28$signer;
         var methodName, isHexStrict, isValidDepositObject, isAddress, isPositiveInt, subchanA, thread, proposedEthBalance, proposedTokenBalance, threadEthBalance, threadTokenBalance, accounts, state, hash, sig;
-        return _regenerator2.default.wrap(function _callee20$(_context20) {
+        return _regenerator2.default.wrap(function _callee19$(_context19) {
           while (1) {
-            switch (_context20.prev = _context20.next) {
+            switch (_context19.prev = _context19.next) {
               case 0:
                 // validate
                 methodName = 'createThreadStateUpdate';
@@ -3095,25 +3039,25 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(balanceA, isValidDepositObject), methodName, 'balanceA');
                 Connext.validatorsResponseToError(validate.single(balanceB, isValidDepositObject), methodName, 'balanceB');
                 // verify subchannel
-                _context20.next = 13;
+                _context19.next = 13;
                 return this.getChannelByPartyA(partyA);
 
               case 13:
-                subchanA = _context20.sent;
-                _context20.next = 16;
+                subchanA = _context19.sent;
+                _context19.next = 16;
                 return this.getThreadById(channelId);
 
               case 16:
-                thread = _context20.sent;
+                thread = _context19.sent;
                 proposedEthBalance = void 0, proposedTokenBalance = void 0;
 
                 if (!(thread === null)) {
-                  _context20.next = 37;
+                  _context19.next = 37;
                   break;
                 }
 
                 if (!(nonce !== 0)) {
-                  _context20.next = 21;
+                  _context19.next = 21;
                   break;
                 }
 
@@ -3121,7 +3065,7 @@ var Connext = function () {
 
               case 21:
                 if (!(balanceB.ethDeposit && !balanceB.ethDeposit.isZero())) {
-                  _context20.next = 23;
+                  _context19.next = 23;
                   break;
                 }
 
@@ -3129,7 +3073,7 @@ var Connext = function () {
 
               case 23:
                 if (!(balanceB.tokenDeposit && !balanceB.tokenDeposit.isZero())) {
-                  _context20.next = 25;
+                  _context19.next = 25;
                   break;
                 }
 
@@ -3137,7 +3081,7 @@ var Connext = function () {
 
               case 25:
                 if (!(partyA.toLowerCase() === partyB.toLowerCase())) {
-                  _context20.next = 27;
+                  _context19.next = 27;
                   break;
                 }
 
@@ -3145,12 +3089,12 @@ var Connext = function () {
 
               case 27:
                 if (!balanceA.ethDeposit) {
-                  _context20.next = 31;
+                  _context19.next = 31;
                   break;
                 }
 
                 if (!Web3.utils.toBN(subchanA.ethBalanceA).lt(balanceA.ethDeposit)) {
-                  _context20.next = 30;
+                  _context19.next = 30;
                   break;
                 }
 
@@ -3161,12 +3105,12 @@ var Connext = function () {
 
               case 31:
                 if (!balanceA.tokenDeposit) {
-                  _context20.next = 35;
+                  _context19.next = 35;
                   break;
                 }
 
                 if (!Web3.utils.toBN(subchanA.tokenBalanceA).lt(balanceA.tokenDeposit)) {
-                  _context20.next = 34;
+                  _context19.next = 34;
                   break;
                 }
 
@@ -3176,12 +3120,12 @@ var Connext = function () {
                 proposedTokenBalance = balanceA.tokenDeposit;
 
               case 35:
-                _context20.next = 68;
+                _context19.next = 68;
                 break;
 
               case 37:
                 if (!(THREAD_STATES[thread.state] === 3)) {
-                  _context20.next = 39;
+                  _context19.next = 39;
                   break;
                 }
 
@@ -3189,7 +3133,7 @@ var Connext = function () {
 
               case 39:
                 if (!(nonce < thread.nonce + 1 && nonce !== 0)) {
-                  _context20.next = 41;
+                  _context19.next = 41;
                   break;
                 }
 
@@ -3197,7 +3141,7 @@ var Connext = function () {
 
               case 41:
                 if (!(partyA.toLowerCase() !== thread.partyA || partyB.toLowerCase() !== thread.partyB)) {
-                  _context20.next = 43;
+                  _context19.next = 43;
                   break;
                 }
 
@@ -3207,13 +3151,13 @@ var Connext = function () {
                 // verify updates dont change channel balance
                 threadEthBalance = Web3.utils.toBN(thread.ethBalanceA).add(Web3.utils.toBN(thread.ethBalanceB));
                 threadTokenBalance = Web3.utils.toBN(thread.tokenBalanceA).add(Web3.utils.toBN(thread.tokenBalanceB));
-                _context20.t0 = CHANNEL_TYPES[updateType];
-                _context20.next = _context20.t0 === CHANNEL_TYPES.ETH ? 48 : _context20.t0 === CHANNEL_TYPES.TOKEN ? 52 : _context20.t0 === CHANNEL_TYPES.TOKEN_ETH ? 56 : 63;
+                _context19.t0 = CHANNEL_TYPES[updateType];
+                _context19.next = _context19.t0 === CHANNEL_TYPES.ETH ? 48 : _context19.t0 === CHANNEL_TYPES.TOKEN ? 52 : _context19.t0 === CHANNEL_TYPES.TOKEN_ETH ? 56 : 63;
                 break;
 
               case 48:
                 if (!balanceB.ethDeposit.lt(Web3.utils.toBN(thread.ethBalanceB))) {
-                  _context20.next = 50;
+                  _context19.next = 50;
                   break;
                 }
 
@@ -3221,11 +3165,11 @@ var Connext = function () {
 
               case 50:
                 proposedEthBalance = Web3.utils.toBN(balanceA.ethDeposit).add(balanceB.ethDeposit); // proposed balance
-                return _context20.abrupt('break', 64);
+                return _context19.abrupt('break', 64);
 
               case 52:
                 if (!balanceB.tokenDeposit.lt(Web3.utils.toBN(thread.tokenBalanceB))) {
-                  _context20.next = 54;
+                  _context19.next = 54;
                   break;
                 }
 
@@ -3233,11 +3177,11 @@ var Connext = function () {
 
               case 54:
                 proposedTokenBalance = Web3.utils.toBN(balanceA.tokenDeposit).add(balanceB.tokenDeposit);
-                return _context20.abrupt('break', 64);
+                return _context19.abrupt('break', 64);
 
               case 56:
                 if (!balanceB.ethDeposit.lt(Web3.utils.toBN(thread.ethBalanceB))) {
-                  _context20.next = 58;
+                  _context19.next = 58;
                   break;
                 }
 
@@ -3245,7 +3189,7 @@ var Connext = function () {
 
               case 58:
                 if (!balanceB.tokenDeposit.lt(Web3.utils.toBN(thread.tokenBalanceB))) {
-                  _context20.next = 60;
+                  _context19.next = 60;
                   break;
                 }
 
@@ -3254,14 +3198,14 @@ var Connext = function () {
               case 60:
                 proposedEthBalance = Web3.utils.toBN(balanceA.ethDeposit).add(balanceB.ethDeposit);
                 proposedTokenBalance = Web3.utils.toBN(balanceA.tokenDeposit).add(balanceB.tokenDeposit);
-                return _context20.abrupt('break', 64);
+                return _context19.abrupt('break', 64);
 
               case 63:
                 throw new ThreadUpdateError(methodName, 'Invalid thread update type.');
 
               case 64:
                 if (!(proposedEthBalance && !proposedEthBalance.eq(threadEthBalance))) {
-                  _context20.next = 66;
+                  _context19.next = 66;
                   break;
                 }
 
@@ -3269,18 +3213,18 @@ var Connext = function () {
 
               case 66:
                 if (!(proposedTokenBalance && !proposedTokenBalance.eq(threadTokenBalance))) {
-                  _context20.next = 68;
+                  _context19.next = 68;
                   break;
                 }
 
                 throw new ThreadUpdateError(methodName, 'Thread token balance cannot change');
 
               case 68:
-                _context20.next = 70;
+                _context19.next = 70;
                 return this.web3.eth.getAccounts();
 
               case 70:
-                accounts = _context20.sent;
+                accounts = _context19.sent;
 
                 // generate and sign hash
                 state = {
@@ -3311,67 +3255,67 @@ var Connext = function () {
                 sig = void 0;
 
                 if (!(signer && unlockedAccountPresent)) {
-                  _context20.next = 81;
+                  _context19.next = 81;
                   break;
                 }
 
-                _context20.next = 78;
+                _context19.next = 78;
                 return this.web3.eth.sign(hash, signer);
 
               case 78:
-                sig = _context20.sent;
-                _context20.next = 96;
+                sig = _context19.sent;
+                _context19.next = 96;
                 break;
 
               case 81:
                 if (!signer) {
-                  _context20.next = 87;
+                  _context19.next = 87;
                   break;
                 }
 
-                _context20.next = 84;
+                _context19.next = 84;
                 return this.web3.eth.personal.sign(hash, signer);
 
               case 84:
-                sig = _context20.sent;
-                _context20.next = 96;
+                sig = _context19.sent;
+                _context19.next = 96;
                 break;
 
               case 87:
                 if (!unlockedAccountPresent) {
-                  _context20.next = 93;
+                  _context19.next = 93;
                   break;
                 }
 
-                _context20.next = 90;
+                _context19.next = 90;
                 return this.web3.eth.sign(hash, accounts[0]);
 
               case 90:
-                sig = _context20.sent;
-                _context20.next = 96;
+                sig = _context19.sent;
+                _context19.next = 96;
                 break;
 
               case 93:
-                _context20.next = 95;
+                _context19.next = 95;
                 return this.web3.eth.personal.sign(hash, accounts[0]);
 
               case 95:
-                sig = _context20.sent;
+                sig = _context19.sent;
 
               case 96:
                 console.log('sig:', sig);
-                return _context20.abrupt('return', sig);
+                return _context19.abrupt('return', sig);
 
               case 98:
               case 'end':
-                return _context20.stop();
+                return _context19.stop();
             }
           }
-        }, _callee20, this);
+        }, _callee19, this);
       }));
 
-      function createThreadStateUpdate(_x39) {
-        return _ref30.apply(this, arguments);
+      function createThreadStateUpdate(_x37) {
+        return _ref29.apply(this, arguments);
       }
 
       return createThreadStateUpdate;
@@ -3390,21 +3334,21 @@ var Connext = function () {
     // ***************************************
 
     value: function () {
-      var _ref32 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee21(_ref31) {
-        var _ref31$ingridAddress = _ref31.ingridAddress,
-            ingridAddress = _ref31$ingridAddress === undefined ? this.ingridAddress : _ref31$ingridAddress,
-            channelId = _ref31.channelId,
-            initialDeposits = _ref31.initialDeposits,
-            challenge = _ref31.challenge,
-            channelType = _ref31.channelType,
-            _ref31$tokenAddress = _ref31.tokenAddress,
-            tokenAddress = _ref31$tokenAddress === undefined ? null : _ref31$tokenAddress,
-            _ref31$sender = _ref31.sender,
-            sender = _ref31$sender === undefined ? null : _ref31$sender;
+      var _ref31 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee20(_ref30) {
+        var _ref30$ingridAddress = _ref30.ingridAddress,
+            ingridAddress = _ref30$ingridAddress === undefined ? this.ingridAddress : _ref30$ingridAddress,
+            channelId = _ref30.channelId,
+            initialDeposits = _ref30.initialDeposits,
+            challenge = _ref30.challenge,
+            channelType = _ref30.channelType,
+            _ref30$tokenAddress = _ref30.tokenAddress,
+            tokenAddress = _ref30$tokenAddress === undefined ? null : _ref30$tokenAddress,
+            _ref30$sender = _ref30.sender,
+            sender = _ref30$sender === undefined ? null : _ref30$sender;
         var methodName, isHexStrict, isAddress, isPositiveInt, isValidDepositObject, accounts, result, token, tokenApproval, contractEth, contractToken;
-        return _regenerator2.default.wrap(function _callee21$(_context21) {
+        return _regenerator2.default.wrap(function _callee20$(_context20) {
           while (1) {
-            switch (_context21.prev = _context21.next) {
+            switch (_context20.prev = _context20.next) {
               case 0:
                 methodName = 'createChannelContractHandler';
                 // validate
@@ -3423,26 +3367,26 @@ var Connext = function () {
                 }
 
                 if (!sender) {
-                  _context21.next = 14;
+                  _context20.next = 14;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context21.next = 18;
+                _context20.next = 18;
                 break;
 
               case 14:
-                _context21.next = 16;
+                _context20.next = 16;
                 return this.web3.eth.getAccounts();
 
               case 16:
-                accounts = _context21.sent;
+                accounts = _context20.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 18:
                 if (!(sender === ingridAddress)) {
-                  _context21.next = 20;
+                  _context20.next = 20;
                   break;
                 }
 
@@ -3450,14 +3394,14 @@ var Connext = function () {
 
               case 20:
                 result = void 0, token = void 0, tokenApproval = void 0;
-                _context21.t0 = CHANNEL_TYPES[channelType];
-                _context21.next = _context21.t0 === CHANNEL_TYPES.ETH ? 24 : _context21.t0 === CHANNEL_TYPES.TOKEN ? 29 : _context21.t0 === CHANNEL_TYPES.TOKEN_ETH ? 33 : 39;
+                _context20.t0 = CHANNEL_TYPES[channelType];
+                _context20.next = _context20.t0 === CHANNEL_TYPES.ETH ? 24 : _context20.t0 === CHANNEL_TYPES.TOKEN ? 29 : _context20.t0 === CHANNEL_TYPES.TOKEN_ETH ? 33 : 39;
                 break;
 
               case 24:
                 // ETH
                 tokenAddress = '0x0';
-                _context21.next = 27;
+                _context20.next = 27;
                 return this.channelManagerInstance.methods.createChannel(channelId, ingridAddress, challenge, tokenAddress, [initialDeposits.ethDeposit, Web3.utils.toBN('0')]).send({
                   from: sender,
                   value: initialDeposits.ethDeposit,
@@ -3465,26 +3409,26 @@ var Connext = function () {
                 });
 
               case 27:
-                result = _context21.sent;
-                return _context21.abrupt('break', 40);
+                result = _context20.sent;
+                return _context20.abrupt('break', 40);
 
               case 29:
-                _context21.next = 31;
+                _context20.next = 31;
                 return this.channelManagerInstance.methods.createChannel(channelId, ingridAddress, challenge, tokenAddress, [Web3.utils.toBN('0'), initialDeposits.tokenDeposit]).send({
                   from: sender,
                   gas: 750000
                 });
 
               case 31:
-                result = _context21.sent;
-                return _context21.abrupt('break', 40);
+                result = _context20.sent;
+                return _context20.abrupt('break', 40);
 
               case 33:
                 // ETH/TOKEN
                 // wallet must approve contract token transfer
                 contractEth = initialDeposits.ethDeposit ? initialDeposits.ethDeposit : Web3.utils.toBN('0');
                 contractToken = initialDeposits.tokenDeposit ? initialDeposits.tokenDeposit : Web3.utils.toBN('0');
-                _context21.next = 37;
+                _context20.next = 37;
                 return this.channelManagerInstance.methods.createChannel(channelId, ingridAddress, challenge, tokenAddress, [contractEth, contractToken]).send({
                   from: sender,
                   value: contractEth,
@@ -3492,15 +3436,15 @@ var Connext = function () {
                 });
 
               case 37:
-                result = _context21.sent;
-                return _context21.abrupt('break', 40);
+                result = _context20.sent;
+                return _context20.abrupt('break', 40);
 
               case 39:
                 throw new ChannelOpenError(methodName, 'Invalid channel type');
 
               case 40:
                 if (result.transactionHash) {
-                  _context21.next = 42;
+                  _context20.next = 42;
                   break;
                 }
 
@@ -3508,25 +3452,25 @@ var Connext = function () {
 
               case 42:
                 if (result.blockNumber) {
-                  _context21.next = 44;
+                  _context20.next = 44;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, result.transactionHash, 'Transaction failed');
 
               case 44:
-                return _context21.abrupt('return', result);
+                return _context20.abrupt('return', result);
 
               case 45:
               case 'end':
-                return _context21.stop();
+                return _context20.stop();
             }
           }
-        }, _callee21, this);
+        }, _callee20, this);
       }));
 
-      function createChannelContractHandler(_x40) {
-        return _ref32.apply(this, arguments);
+      function createChannelContractHandler(_x38) {
+        return _ref31.apply(this, arguments);
       }
 
       return createChannelContractHandler;
@@ -3543,12 +3487,12 @@ var Connext = function () {
   }, {
     key: 'ChannelOpenTimeoutContractHandler',
     value: function () {
-      var _ref33 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee22(channelId) {
+      var _ref32 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee21(channelId) {
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isAddress, isHexStrict, accounts, channel, result;
-        return _regenerator2.default.wrap(function _callee22$(_context22) {
+        return _regenerator2.default.wrap(function _callee21$(_context21) {
           while (1) {
-            switch (_context22.prev = _context22.next) {
+            switch (_context21.prev = _context21.next) {
               case 0:
                 methodName = 'ChannelOpenTimeoutContractHandler';
                 // validate
@@ -3559,32 +3503,32 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
 
                 if (!sender) {
-                  _context22.next = 8;
+                  _context21.next = 8;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context22.next = 12;
+                _context21.next = 12;
                 break;
 
               case 8:
-                _context22.next = 10;
+                _context21.next = 10;
                 return this.web3.eth.getAccounts();
 
               case 10:
-                accounts = _context22.sent;
+                accounts = _context21.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 12:
-                _context22.next = 14;
+                _context21.next = 14;
                 return this.getChannelById(channelId);
 
               case 14:
-                channel = _context22.sent;
+                channel = _context21.sent;
 
                 if (!(CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENING)) {
-                  _context22.next = 17;
+                  _context21.next = 17;
                   break;
                 }
 
@@ -3592,24 +3536,24 @@ var Connext = function () {
 
               case 17:
                 if (!(channel.partyA.toLowerCase() !== sender.toLowerCase())) {
-                  _context22.next = 19;
+                  _context21.next = 19;
                   break;
                 }
 
                 throw new ContractError(methodName, 'Caller must be partyA in ledger channel');
 
               case 19:
-                _context22.next = 21;
+                _context21.next = 21;
                 return this.channelManagerInstance.methods.LCOpenTimeout(channelId).send({
                   from: sender,
                   gas: 470000
                 });
 
               case 21:
-                result = _context22.sent;
+                result = _context21.sent;
 
                 if (result.transactionHash) {
-                  _context22.next = 24;
+                  _context21.next = 24;
                   break;
                 }
 
@@ -3617,25 +3561,25 @@ var Connext = function () {
 
               case 24:
                 if (result.blockNumber) {
-                  _context22.next = 26;
+                  _context21.next = 26;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, result.transactionHash, 'Transaction failed');
 
               case 26:
-                return _context22.abrupt('return', result);
+                return _context21.abrupt('return', result);
 
               case 27:
               case 'end':
-                return _context22.stop();
+                return _context21.stop();
             }
           }
-        }, _callee22, this);
+        }, _callee21, this);
       }));
 
-      function ChannelOpenTimeoutContractHandler(_x42) {
-        return _ref33.apply(this, arguments);
+      function ChannelOpenTimeoutContractHandler(_x40) {
+        return _ref32.apply(this, arguments);
       }
 
       return ChannelOpenTimeoutContractHandler;
@@ -3643,19 +3587,19 @@ var Connext = function () {
   }, {
     key: 'depositContractHandler',
     value: function () {
-      var _ref35 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee23(_ref34) {
-        var channelId = _ref34.channelId,
-            deposits = _ref34.deposits,
-            _ref34$sender = _ref34.sender,
-            sender = _ref34$sender === undefined ? null : _ref34$sender,
-            _ref34$recipient = _ref34.recipient,
-            recipient = _ref34$recipient === undefined ? sender : _ref34$recipient,
-            _ref34$tokenAddress = _ref34.tokenAddress,
-            tokenAddress = _ref34$tokenAddress === undefined ? null : _ref34$tokenAddress;
+      var _ref34 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee22(_ref33) {
+        var channelId = _ref33.channelId,
+            deposits = _ref33.deposits,
+            _ref33$sender = _ref33.sender,
+            sender = _ref33$sender === undefined ? null : _ref33$sender,
+            _ref33$recipient = _ref33.recipient,
+            recipient = _ref33$recipient === undefined ? sender : _ref33$recipient,
+            _ref33$tokenAddress = _ref33.tokenAddress,
+            tokenAddress = _ref33$tokenAddress === undefined ? null : _ref33$tokenAddress;
         var methodName, isHexStrict, isValidDepositObject, isAddress, accounts, channel, ethDeposit, tokenDeposit, depositType, result;
-        return _regenerator2.default.wrap(function _callee23$(_context23) {
+        return _regenerator2.default.wrap(function _callee22$(_context22) {
           while (1) {
-            switch (_context23.prev = _context23.next) {
+            switch (_context22.prev = _context22.next) {
               case 0:
                 methodName = 'depositContractHandler';
                 // validate
@@ -3666,11 +3610,11 @@ var Connext = function () {
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
                 Connext.validatorsResponseToError(validate.single(deposits, isValidDepositObject), methodName, 'deposits');
-                _context23.next = 8;
+                _context22.next = 8;
                 return this.web3.eth.getAccounts();
 
               case 8:
-                accounts = _context23.sent;
+                accounts = _context22.sent;
 
                 if (sender) {
                   Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
@@ -3685,14 +3629,14 @@ var Connext = function () {
                 }
 
                 // verify requires --> already checked in deposit() fn, necessary?
-                _context23.next = 13;
+                _context22.next = 13;
                 return this.getChannelById(channelId);
 
               case 13:
-                channel = _context23.sent;
+                channel = _context22.sent;
 
                 if (!(CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENED)) {
-                  _context23.next = 16;
+                  _context22.next = 16;
                   break;
                 }
 
@@ -3700,7 +3644,7 @@ var Connext = function () {
 
               case 16:
                 if (!(recipient.toLowerCase() !== channel.partyA.toLowerCase() && recipient.toLowerCase() !== channel.partyI.toLowerCase())) {
-                  _context23.next = 18;
+                  _context22.next = 18;
                   break;
                 }
 
@@ -3724,12 +3668,12 @@ var Connext = function () {
                 }
 
                 result = void 0;
-                _context23.t0 = CHANNEL_TYPES[depositType];
-                _context23.next = _context23.t0 === CHANNEL_TYPES.ETH ? 25 : _context23.t0 === CHANNEL_TYPES.TOKEN ? 29 : 33;
+                _context22.t0 = CHANNEL_TYPES[depositType];
+                _context22.next = _context22.t0 === CHANNEL_TYPES.ETH ? 25 : _context22.t0 === CHANNEL_TYPES.TOKEN ? 29 : 33;
                 break;
 
               case 25:
-                _context23.next = 27;
+                _context22.next = 27;
                 return this.channelManagerInstance.methods.deposit(channelId, // PARAM NOT IN CONTRACT YET, SHOULD BE
                 recipient, deposits.ethDeposit, false).send({
                   from: sender,
@@ -3738,26 +3682,26 @@ var Connext = function () {
                 });
 
               case 27:
-                result = _context23.sent;
-                return _context23.abrupt('break', 34);
+                result = _context22.sent;
+                return _context22.abrupt('break', 34);
 
               case 29:
-                _context23.next = 31;
+                _context22.next = 31;
                 return this.channelManagerInstance.methods.deposit(channelId, recipient, deposits.tokenDeposit, true).send({
                   from: sender,
                   gas: 1000000
                 });
 
               case 31:
-                result = _context23.sent;
-                return _context23.abrupt('break', 34);
+                result = _context22.sent;
+                return _context22.abrupt('break', 34);
 
               case 33:
                 throw new ChannelUpdateError(methodName, 'Invalid deposit type detected');
 
               case 34:
                 if (result.transactionHash) {
-                  _context23.next = 36;
+                  _context22.next = 36;
                   break;
                 }
 
@@ -3765,25 +3709,25 @@ var Connext = function () {
 
               case 36:
                 if (result.blockNumber) {
-                  _context23.next = 38;
+                  _context22.next = 38;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, result.transactionHash, 'Transaction failed');
 
               case 38:
-                return _context23.abrupt('return', result);
+                return _context22.abrupt('return', result);
 
               case 39:
               case 'end':
-                return _context23.stop();
+                return _context22.stop();
             }
           }
-        }, _callee23, this);
+        }, _callee22, this);
       }));
 
-      function depositContractHandler(_x43) {
-        return _ref35.apply(this, arguments);
+      function depositContractHandler(_x41) {
+        return _ref34.apply(this, arguments);
       }
 
       return depositContractHandler;
@@ -3791,19 +3735,19 @@ var Connext = function () {
   }, {
     key: 'consensusCloseChannelContractHandler',
     value: function () {
-      var _ref37 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee24(_ref36) {
-        var channelId = _ref36.channelId,
-            nonce = _ref36.nonce,
-            balanceA = _ref36.balanceA,
-            balanceI = _ref36.balanceI,
-            sigA = _ref36.sigA,
-            sigI = _ref36.sigI,
-            _ref36$sender = _ref36.sender,
-            sender = _ref36$sender === undefined ? null : _ref36$sender;
+      var _ref36 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee23(_ref35) {
+        var channelId = _ref35.channelId,
+            nonce = _ref35.nonce,
+            balanceA = _ref35.balanceA,
+            balanceI = _ref35.balanceI,
+            sigA = _ref35.sigA,
+            sigI = _ref35.sigI,
+            _ref35$sender = _ref35.sender,
+            sender = _ref35$sender === undefined ? null : _ref35$sender;
         var methodName, isHexStrict, isPositiveInt, isValidDepositObject, isHex, isAddress, accounts, emptyRootHash, state, signer, result;
-        return _regenerator2.default.wrap(function _callee24$(_context24) {
+        return _regenerator2.default.wrap(function _callee23$(_context23) {
           while (1) {
-            switch (_context24.prev = _context24.next) {
+            switch (_context23.prev = _context23.next) {
               case 0:
                 methodName = 'consensusCloseChannelContractHandler';
                 // validate
@@ -3822,20 +3766,20 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(sigI, isHex), methodName, 'sigI');
 
                 if (!sender) {
-                  _context24.next = 16;
+                  _context23.next = 16;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context24.next = 20;
+                _context23.next = 20;
                 break;
 
               case 16:
-                _context24.next = 18;
+                _context23.next = 18;
                 return this.web3.eth.getAccounts();
 
               case 18:
-                accounts = _context24.sent;
+                accounts = _context23.sent;
 
                 sender = accounts[0].toLowerCase();
 
@@ -3859,7 +3803,7 @@ var Connext = function () {
                 signer = Connext.recoverSignerFromChannelStateUpdate(state);
 
                 if (!(signer.toLowerCase() !== this.ingridAddress.toLowerCase())) {
-                  _context24.next = 25;
+                  _context23.next = 25;
                   break;
                 }
 
@@ -3870,24 +3814,24 @@ var Connext = function () {
                 signer = Connext.recoverSignerFromChannelStateUpdate(state);
 
                 if (!(signer.toLowerCase() !== sender.toLowerCase())) {
-                  _context24.next = 29;
+                  _context23.next = 29;
                   break;
                 }
 
                 throw new ChannelCloseError(methodName, 'PartyA did not sign closing update');
 
               case 29:
-                _context24.next = 31;
+                _context23.next = 31;
                 return this.channelManagerInstance.methods.consensusCloseChannel(channelId, nonce, [state.ethBalanceA, state.ethBalanceI, state.tokenBalanceA, state.tokenBalanceI], sigA, sigI).send({
                   from: sender,
                   gas: 1000000
                 });
 
               case 31:
-                result = _context24.sent;
+                result = _context23.sent;
 
                 if (result.transactionHash) {
-                  _context24.next = 34;
+                  _context23.next = 34;
                   break;
                 }
 
@@ -3895,25 +3839,25 @@ var Connext = function () {
 
               case 34:
                 if (result.blockNumber) {
-                  _context24.next = 36;
+                  _context23.next = 36;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, result.transactionHash, 'Transaction failed');
 
               case 36:
-                return _context24.abrupt('return', result);
+                return _context23.abrupt('return', result);
 
               case 37:
               case 'end':
-                return _context24.stop();
+                return _context23.stop();
             }
           }
-        }, _callee24, this);
+        }, _callee23, this);
       }));
 
-      function consensusCloseChannelContractHandler(_x44) {
-        return _ref37.apply(this, arguments);
+      function consensusCloseChannelContractHandler(_x42) {
+        return _ref36.apply(this, arguments);
       }
 
       return consensusCloseChannelContractHandler;
@@ -3924,16 +3868,16 @@ var Connext = function () {
   }, {
     key: 'joinChannelContractHandler',
     value: function () {
-      var _ref39 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee25(_ref38) {
-        var lcId = _ref38.lcId,
-            _ref38$deposit = _ref38.deposit,
-            deposit = _ref38$deposit === undefined ? null : _ref38$deposit,
-            _ref38$sender = _ref38.sender,
-            sender = _ref38$sender === undefined ? null : _ref38$sender;
+      var _ref38 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee24(_ref37) {
+        var lcId = _ref37.lcId,
+            _ref37$deposit = _ref37.deposit,
+            deposit = _ref37$deposit === undefined ? null : _ref37$deposit,
+            _ref37$sender = _ref37.sender,
+            sender = _ref37$sender === undefined ? null : _ref37$sender;
         var methodName, isAddress, isHexStrict, isBN, lc, result;
-        return _regenerator2.default.wrap(function _callee25$(_context25) {
+        return _regenerator2.default.wrap(function _callee24$(_context24) {
           while (1) {
-            switch (_context25.prev = _context25.next) {
+            switch (_context24.prev = _context24.next) {
               case 0:
                 methodName = 'joinChannelContractHandler';
                 isAddress = { presence: true, isAddress: true };
@@ -3943,21 +3887,21 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(lcId, isHexStrict), methodName, 'lcId');
 
                 if (!deposit) {
-                  _context25.next = 11;
+                  _context24.next = 11;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(deposit, isBN), methodName, 'deposit');
 
                 if (!deposit.isNeg()) {
-                  _context25.next = 9;
+                  _context24.next = 9;
                   break;
                 }
 
                 throw new ChannelOpenError(methodName, 'Invalid deposit provided');
 
               case 9:
-                _context25.next = 12;
+                _context24.next = 12;
                 break;
 
               case 11:
@@ -3967,14 +3911,14 @@ var Connext = function () {
                 if (sender) {
                   Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
                 }
-                _context25.next = 15;
+                _context24.next = 15;
                 return this.getChannelById(lcId);
 
               case 15:
-                lc = _context25.sent;
+                lc = _context24.sent;
 
                 if (lc) {
-                  _context25.next = 18;
+                  _context24.next = 18;
                   break;
                 }
 
@@ -3982,7 +3926,7 @@ var Connext = function () {
 
               case 18:
                 if (!(sender && sender.toLowerCase() === lc.partyA)) {
-                  _context25.next = 20;
+                  _context24.next = 20;
                   break;
                 }
 
@@ -3990,7 +3934,7 @@ var Connext = function () {
 
               case 20:
                 if (!(sender && sender !== lc.partyI)) {
-                  _context25.next = 22;
+                  _context24.next = 22;
                   break;
                 }
 
@@ -3998,14 +3942,14 @@ var Connext = function () {
 
               case 22:
                 if (!(CHANNEL_STATES[lc.state] !== 0)) {
-                  _context25.next = 24;
+                  _context24.next = 24;
                   break;
                 }
 
                 throw new ChannelOpenError(methodName, 'Channel is not in correct state');
 
               case 24:
-                _context25.next = 26;
+                _context24.next = 26;
                 return this.channelManagerInstance.methods.joinThread(lcId).send({
                   from: sender || this.ingridAddress, // can also be accounts[0], easier for testing
                   value: deposit,
@@ -4013,10 +3957,10 @@ var Connext = function () {
                 });
 
               case 26:
-                result = _context25.sent;
+                result = _context24.sent;
 
                 if (result.transactionHash) {
-                  _context25.next = 29;
+                  _context24.next = 29;
                   break;
                 }
 
@@ -4024,25 +3968,25 @@ var Connext = function () {
 
               case 29:
                 if (result.blockNumber) {
-                  _context25.next = 31;
+                  _context24.next = 31;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, result.transactionHash, 'Transaction failed');
 
               case 31:
-                return _context25.abrupt('return', result);
+                return _context24.abrupt('return', result);
 
               case 32:
               case 'end':
-                return _context25.stop();
+                return _context24.stop();
             }
           }
-        }, _callee25, this);
+        }, _callee24, this);
       }));
 
-      function joinChannelContractHandler(_x45) {
-        return _ref39.apply(this, arguments);
+      function joinChannelContractHandler(_x43) {
+        return _ref38.apply(this, arguments);
       }
 
       return joinChannelContractHandler;
@@ -4050,21 +3994,21 @@ var Connext = function () {
   }, {
     key: 'updateChannelStateContractHandler',
     value: function () {
-      var _ref41 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee26(_ref40) {
-        var channelId = _ref40.channelId,
-            nonce = _ref40.nonce,
-            openVcs = _ref40.openVcs,
-            balanceA = _ref40.balanceA,
-            balanceI = _ref40.balanceI,
-            vcRootHash = _ref40.vcRootHash,
-            sigA = _ref40.sigA,
-            sigI = _ref40.sigI,
-            _ref40$sender = _ref40.sender,
-            sender = _ref40$sender === undefined ? null : _ref40$sender;
+      var _ref40 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee25(_ref39) {
+        var channelId = _ref39.channelId,
+            nonce = _ref39.nonce,
+            openVcs = _ref39.openVcs,
+            balanceA = _ref39.balanceA,
+            balanceI = _ref39.balanceI,
+            vcRootHash = _ref39.vcRootHash,
+            sigA = _ref39.sigA,
+            sigI = _ref39.sigI,
+            _ref39$sender = _ref39.sender,
+            sender = _ref39$sender === undefined ? null : _ref39$sender;
         var methodName, isHexStrict, isPositiveInt, isValidDepositObject, isHex, isAddress, accounts, ethBalanceA, ethBalanceI, tokenBalanceA, tokenBalanceI, result;
-        return _regenerator2.default.wrap(function _callee26$(_context26) {
+        return _regenerator2.default.wrap(function _callee25$(_context25) {
           while (1) {
-            switch (_context26.prev = _context26.next) {
+            switch (_context25.prev = _context25.next) {
               case 0:
                 methodName = 'updateChannelStateContractHandler';
                 // validate
@@ -4085,20 +4029,20 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(sigI, isHex), methodName, 'sigI');
 
                 if (!sender) {
-                  _context26.next = 18;
+                  _context25.next = 18;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context26.next = 22;
+                _context25.next = 22;
                 break;
 
               case 18:
-                _context26.next = 20;
+                _context25.next = 20;
                 return this.web3.eth.getAccounts();
 
               case 20:
-                accounts = _context26.sent;
+                accounts = _context25.sent;
 
                 sender = accounts[0].toLowerCase();
 
@@ -4107,17 +4051,17 @@ var Connext = function () {
                 ethBalanceI = balanceI.ethDeposit ? balanceI.ethDeposit : Web3.utils.toBN('0');
                 tokenBalanceA = balanceA.tokenDeposit ? balanceA.tokenDeposit : Web3.utils.toBN('0');
                 tokenBalanceI = balanceI.tokenDeposit ? balanceI.tokenDeposit : Web3.utils.toBN('0');
-                _context26.next = 28;
+                _context25.next = 28;
                 return this.channelManagerInstance.methods.updateLCstate(channelId, [nonce, openVcs, ethBalanceA, ethBalanceI, tokenBalanceA, tokenBalanceI], Web3.utils.padRight(vcRootHash, 64), sigA, sigI).send({
                   from: sender,
                   gas: '6721975'
                 });
 
               case 28:
-                result = _context26.sent;
+                result = _context25.sent;
 
                 if (result.transactionHash) {
-                  _context26.next = 31;
+                  _context25.next = 31;
                   break;
                 }
 
@@ -4125,25 +4069,25 @@ var Connext = function () {
 
               case 31:
                 if (result.blockNumber) {
-                  _context26.next = 33;
+                  _context25.next = 33;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, result.transactionHash, 'Transaction failed');
 
               case 33:
-                return _context26.abrupt('return', result);
+                return _context25.abrupt('return', result);
 
               case 34:
               case 'end':
-                return _context26.stop();
+                return _context25.stop();
             }
           }
-        }, _callee26, this);
+        }, _callee25, this);
       }));
 
-      function updateChannelStateContractHandler(_x46) {
-        return _ref41.apply(this, arguments);
+      function updateChannelStateContractHandler(_x44) {
+        return _ref40.apply(this, arguments);
       }
 
       return updateChannelStateContractHandler;
@@ -4151,21 +4095,21 @@ var Connext = function () {
   }, {
     key: 'initThreadContractHandler',
     value: function () {
-      var _ref43 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee27(_ref42) {
-        var subchanId = _ref42.subchanId,
-            threadId = _ref42.threadId,
-            _ref42$proof = _ref42.proof,
-            proof = _ref42$proof === undefined ? null : _ref42$proof,
-            partyA = _ref42.partyA,
-            partyB = _ref42.partyB,
-            balanceA = _ref42.balanceA,
-            sigA = _ref42.sigA,
-            _ref42$sender = _ref42.sender,
-            sender = _ref42$sender === undefined ? null : _ref42$sender;
+      var _ref42 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee26(_ref41) {
+        var subchanId = _ref41.subchanId,
+            threadId = _ref41.threadId,
+            _ref41$proof = _ref41.proof,
+            proof = _ref41$proof === undefined ? null : _ref41$proof,
+            partyA = _ref41.partyA,
+            partyB = _ref41.partyB,
+            balanceA = _ref41.balanceA,
+            sigA = _ref41.sigA,
+            _ref41$sender = _ref41.sender,
+            sender = _ref41$sender === undefined ? null : _ref41$sender;
         var methodName, isAddress, isHexStrict, isValidDepositObject, isHex, accounts, ethBalanceA, tokenBalanceA, merkle, stateHash, threadInitialStates, mproof, i, results;
-        return _regenerator2.default.wrap(function _callee27$(_context27) {
+        return _regenerator2.default.wrap(function _callee26$(_context26) {
           while (1) {
-            switch (_context27.prev = _context27.next) {
+            switch (_context26.prev = _context26.next) {
               case 0:
                 methodName = 'initThreadContractHandler';
                 // validate
@@ -4183,20 +4127,20 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(sigA, isHex), methodName, 'sigA');
 
                 if (!sender) {
-                  _context27.next = 15;
+                  _context26.next = 15;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context27.next = 19;
+                _context26.next = 19;
                 break;
 
               case 15:
-                _context27.next = 17;
+                _context26.next = 17;
                 return this.web3.eth.getAccounts();
 
               case 17:
-                accounts = _context27.sent;
+                accounts = _context26.sent;
 
                 sender = accounts[0].toLowerCase();
 
@@ -4206,7 +4150,7 @@ var Connext = function () {
                 merkle = void 0, stateHash = void 0;
 
                 if (!(proof === null)) {
-                  _context27.next = 33;
+                  _context26.next = 33;
                   break;
                 }
 
@@ -4221,11 +4165,11 @@ var Connext = function () {
                   tokenBalanceA: tokenBalanceA,
                   tokenBalanceB: Web3.utils.toBN('0')
                 });
-                _context27.next = 26;
+                _context26.next = 26;
                 return this.getThreadInitialStates(subchanId);
 
               case 26:
-                threadInitialStates = _context27.sent;
+                threadInitialStates = _context26.sent;
 
                 merkle = Connext.generateMerkleTree(threadInitialStates);
                 mproof = merkle.proof(Utils.hexToBuffer(stateHash));
@@ -4241,7 +4185,7 @@ var Connext = function () {
                 proof = Utils.marshallState(proof);
 
               case 33:
-                _context27.next = 35;
+                _context26.next = 35;
                 return this.channelManagerInstance.methods.initVCstate(subchanId, threadId, proof, 0, partyA, partyB, [ethBalanceA, tokenBalanceA], [ethBalanceA, Web3.utils.toBN('0'), tokenBalanceA, Web3.utils.toBN('0')], sigA)
                 // .estimateGas({
                 //   from: sender,
@@ -4252,10 +4196,10 @@ var Connext = function () {
                 });
 
               case 35:
-                results = _context27.sent;
+                results = _context26.sent;
 
                 if (results.transactionHash) {
-                  _context27.next = 38;
+                  _context26.next = 38;
                   break;
                 }
 
@@ -4263,7 +4207,7 @@ var Connext = function () {
 
               case 38:
                 if (results.transactionHash) {
-                  _context27.next = 40;
+                  _context26.next = 40;
                   break;
                 }
 
@@ -4271,25 +4215,25 @@ var Connext = function () {
 
               case 40:
                 if (results.blockNumber) {
-                  _context27.next = 42;
+                  _context26.next = 42;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, results.transactionHash, 'Transaction failed');
 
               case 42:
-                return _context27.abrupt('return', results);
+                return _context26.abrupt('return', results);
 
               case 43:
               case 'end':
-                return _context27.stop();
+                return _context26.stop();
             }
           }
-        }, _callee27, this);
+        }, _callee26, this);
       }));
 
-      function initThreadContractHandler(_x47) {
-        return _ref43.apply(this, arguments);
+      function initThreadContractHandler(_x45) {
+        return _ref42.apply(this, arguments);
       }
 
       return initThreadContractHandler;
@@ -4297,21 +4241,21 @@ var Connext = function () {
   }, {
     key: 'settleThreadContractHandler',
     value: function () {
-      var _ref45 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee28(_ref44) {
-        var subchanId = _ref44.subchanId,
-            threadId = _ref44.threadId,
-            nonce = _ref44.nonce,
-            partyA = _ref44.partyA,
-            partyB = _ref44.partyB,
-            balanceA = _ref44.balanceA,
-            balanceB = _ref44.balanceB,
-            sigA = _ref44.sigA,
-            _ref44$sender = _ref44.sender,
-            sender = _ref44$sender === undefined ? null : _ref44$sender;
+      var _ref44 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee27(_ref43) {
+        var subchanId = _ref43.subchanId,
+            threadId = _ref43.threadId,
+            nonce = _ref43.nonce,
+            partyA = _ref43.partyA,
+            partyB = _ref43.partyB,
+            balanceA = _ref43.balanceA,
+            balanceB = _ref43.balanceB,
+            sigA = _ref43.sigA,
+            _ref43$sender = _ref43.sender,
+            sender = _ref43$sender === undefined ? null : _ref43$sender;
         var methodName, isAddress, isPositiveInt, isHexStrict, isValidDepositObject, isHex, accounts, ethBalanceA, ethBalanceB, tokenBalanceA, tokenBalanceB, results;
-        return _regenerator2.default.wrap(function _callee28$(_context28) {
+        return _regenerator2.default.wrap(function _callee27$(_context27) {
           while (1) {
-            switch (_context28.prev = _context28.next) {
+            switch (_context27.prev = _context27.next) {
               case 0:
                 methodName = 'settleThreadContractHandler';
                 // validate
@@ -4332,20 +4276,20 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(sigA, isHex), methodName, 'sigA');
 
                 if (!sender) {
-                  _context28.next = 18;
+                  _context27.next = 18;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context28.next = 22;
+                _context27.next = 22;
                 break;
 
               case 18:
-                _context28.next = 20;
+                _context27.next = 20;
                 return this.web3.eth.getAccounts();
 
               case 20:
-                accounts = _context28.sent;
+                accounts = _context27.sent;
 
                 sender = accounts[0].toLowerCase();
 
@@ -4354,17 +4298,17 @@ var Connext = function () {
                 ethBalanceB = balanceB.ethDeposit ? balanceB.ethDeposit : Web3.utils.toBN('0');
                 tokenBalanceA = balanceA.tokenDeposit ? balanceA.tokenDeposit : Web3.utils.toBN('0');
                 tokenBalanceB = balanceB.tokenDeposit ? balanceB.tokenDeposit : Web3.utils.toBN('0');
-                _context28.next = 28;
+                _context27.next = 28;
                 return this.channelManagerInstance.methods.settleVC(subchanId, threadId, nonce, partyA, partyB, [ethBalanceA, ethBalanceB, tokenBalanceA, tokenBalanceB], sigA).send({
                   from: sender,
                   gas: 6721975
                 });
 
               case 28:
-                results = _context28.sent;
+                results = _context27.sent;
 
                 if (results.transactionHash) {
-                  _context28.next = 31;
+                  _context27.next = 31;
                   break;
                 }
 
@@ -4372,25 +4316,25 @@ var Connext = function () {
 
               case 31:
                 if (results.blockNumber) {
-                  _context28.next = 33;
+                  _context27.next = 33;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, results.transactionHash, 'Transaction failed');
 
               case 33:
-                return _context28.abrupt('return', results);
+                return _context27.abrupt('return', results);
 
               case 34:
               case 'end':
-                return _context28.stop();
+                return _context27.stop();
             }
           }
-        }, _callee28, this);
+        }, _callee27, this);
       }));
 
-      function settleThreadContractHandler(_x48) {
-        return _ref45.apply(this, arguments);
+      function settleThreadContractHandler(_x46) {
+        return _ref44.apply(this, arguments);
       }
 
       return settleThreadContractHandler;
@@ -4398,15 +4342,15 @@ var Connext = function () {
   }, {
     key: 'closeVirtualChannelContractHandler',
     value: function () {
-      var _ref47 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee29(_ref46) {
-        var lcId = _ref46.lcId,
-            vcId = _ref46.vcId,
-            _ref46$sender = _ref46.sender,
-            sender = _ref46$sender === undefined ? null : _ref46$sender;
+      var _ref46 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee28(_ref45) {
+        var lcId = _ref45.lcId,
+            vcId = _ref45.vcId,
+            _ref45$sender = _ref45.sender,
+            sender = _ref45$sender === undefined ? null : _ref45$sender;
         var methodName, isHexStrict, isAddress, accounts, results;
-        return _regenerator2.default.wrap(function _callee29$(_context29) {
+        return _regenerator2.default.wrap(function _callee28$(_context28) {
           while (1) {
-            switch (_context29.prev = _context29.next) {
+            switch (_context28.prev = _context28.next) {
               case 0:
                 methodName = 'closeVirtualChannelContractHandler';
                 isHexStrict = { presence: true, isHexStrict: true };
@@ -4416,34 +4360,34 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(vcId, isHexStrict), methodName, 'vcId');
 
                 if (!sender) {
-                  _context29.next = 9;
+                  _context28.next = 9;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context29.next = 13;
+                _context28.next = 13;
                 break;
 
               case 9:
-                _context29.next = 11;
+                _context28.next = 11;
                 return this.web3.eth.getAccounts();
 
               case 11:
-                accounts = _context29.sent;
+                accounts = _context28.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 13:
-                _context29.next = 15;
+                _context28.next = 15;
                 return this.channelManagerInstance.methods.closeVirtualChannel(lcId, vcId).send({
                   from: sender
                 });
 
               case 15:
-                results = _context29.sent;
+                results = _context28.sent;
 
                 if (results.transactionHash) {
-                  _context29.next = 18;
+                  _context28.next = 18;
                   break;
                 }
 
@@ -4451,25 +4395,25 @@ var Connext = function () {
 
               case 18:
                 if (results.blockNumber) {
-                  _context29.next = 20;
+                  _context28.next = 20;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, results.transactionHash, 'Transaction failed');
 
               case 20:
-                return _context29.abrupt('return', results);
+                return _context28.abrupt('return', results);
 
               case 21:
               case 'end':
-                return _context29.stop();
+                return _context28.stop();
             }
           }
-        }, _callee29, this);
+        }, _callee28, this);
       }));
 
-      function closeVirtualChannelContractHandler(_x49) {
-        return _ref47.apply(this, arguments);
+      function closeVirtualChannelContractHandler(_x47) {
+        return _ref46.apply(this, arguments);
       }
 
       return closeVirtualChannelContractHandler;
@@ -4477,14 +4421,14 @@ var Connext = function () {
   }, {
     key: 'byzantineCloseChannelContractHandler',
     value: function () {
-      var _ref49 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee30(_ref48) {
-        var channelId = _ref48.channelId,
-            _ref48$sender = _ref48.sender,
-            sender = _ref48$sender === undefined ? null : _ref48$sender;
+      var _ref48 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee29(_ref47) {
+        var channelId = _ref47.channelId,
+            _ref47$sender = _ref47.sender,
+            sender = _ref47$sender === undefined ? null : _ref47$sender;
         var methodName, isHexStrict, isAddress, accounts, results;
-        return _regenerator2.default.wrap(function _callee30$(_context30) {
+        return _regenerator2.default.wrap(function _callee29$(_context29) {
           while (1) {
-            switch (_context30.prev = _context30.next) {
+            switch (_context29.prev = _context29.next) {
               case 0:
                 methodName = 'byzantineCloseChannelContractHandler';
                 isHexStrict = { presence: true, isHexStrict: true };
@@ -4493,35 +4437,35 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
 
                 if (!sender) {
-                  _context30.next = 8;
+                  _context29.next = 8;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context30.next = 12;
+                _context29.next = 12;
                 break;
 
               case 8:
-                _context30.next = 10;
+                _context29.next = 10;
                 return this.web3.eth.getAccounts();
 
               case 10:
-                accounts = _context30.sent;
+                accounts = _context29.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 12:
-                _context30.next = 14;
+                _context29.next = 14;
                 return this.channelManagerInstance.methods.byzantineCloseChannel(channelId).send({
                   from: sender,
                   gas: '470000'
                 });
 
               case 14:
-                results = _context30.sent;
+                results = _context29.sent;
 
                 if (results.transactionHash) {
-                  _context30.next = 17;
+                  _context29.next = 17;
                   break;
                 }
 
@@ -4529,25 +4473,25 @@ var Connext = function () {
 
               case 17:
                 if (results.blockNumber) {
-                  _context30.next = 19;
+                  _context29.next = 19;
                   break;
                 }
 
                 throw new ContractError(methodName, 302, results.transactionHash, 'Transaction failed');
 
               case 19:
-                return _context30.abrupt('return', results);
+                return _context29.abrupt('return', results);
 
               case 20:
               case 'end':
-                return _context30.stop();
+                return _context29.stop();
             }
           }
-        }, _callee30, this);
+        }, _callee29, this);
       }));
 
-      function byzantineCloseChannelContractHandler(_x50) {
-        return _ref49.apply(this, arguments);
+      function byzantineCloseChannelContractHandler(_x48) {
+        return _ref48.apply(this, arguments);
       }
 
       return byzantineCloseChannelContractHandler;
@@ -4572,52 +4516,52 @@ var Connext = function () {
      * @returns {Promise} resolves to an array of unjoined virtual channel objects
      */
     value: function () {
-      var _ref50 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee31() {
+      var _ref49 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee30() {
         var partyB = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var methodName, isAddress, accounts, response;
-        return _regenerator2.default.wrap(function _callee31$(_context31) {
+        return _regenerator2.default.wrap(function _callee30$(_context30) {
           while (1) {
-            switch (_context31.prev = _context31.next) {
+            switch (_context30.prev = _context30.next) {
               case 0:
                 methodName = 'getUnjoinedThreads';
                 isAddress = { presence: true, isAddress: true };
 
                 if (!partyB) {
-                  _context31.next = 6;
+                  _context30.next = 6;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(partyB, isAddress), methodName, 'partyB');
-                _context31.next = 10;
+                _context30.next = 10;
                 break;
 
               case 6:
-                _context31.next = 8;
+                _context30.next = 8;
                 return this.web3.eth.getAccounts();
 
               case 8:
-                accounts = _context31.sent;
+                accounts = _context30.sent;
 
                 partyB = accounts[0].toLowerCase();
 
               case 10:
-                _context31.next = 12;
+                _context30.next = 12;
                 return this.networking.get('virtualchannel/address/' + partyB.toLowerCase() + '/opening');
 
               case 12:
-                response = _context31.sent;
-                return _context31.abrupt('return', response.data);
+                response = _context30.sent;
+                return _context30.abrupt('return', response.data);
 
               case 14:
               case 'end':
-                return _context31.stop();
+                return _context30.stop();
             }
           }
-        }, _callee31, this);
+        }, _callee30, this);
       }));
 
       function getUnjoinedThreads() {
-        return _ref50.apply(this, arguments);
+        return _ref49.apply(this, arguments);
       }
 
       return getUnjoinedThreads;
@@ -4625,13 +4569,13 @@ var Connext = function () {
   }, {
     key: 'getThreadStateByNonce',
     value: function () {
-      var _ref52 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee32(_ref51) {
-        var channelId = _ref51.channelId,
-            nonce = _ref51.nonce;
+      var _ref51 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee31(_ref50) {
+        var channelId = _ref50.channelId,
+            nonce = _ref50.nonce;
         var methodName, isHexStrict, isPositiveInt, response;
-        return _regenerator2.default.wrap(function _callee32$(_context32) {
+        return _regenerator2.default.wrap(function _callee31$(_context31) {
           while (1) {
-            switch (_context32.prev = _context32.next) {
+            switch (_context31.prev = _context31.next) {
               case 0:
                 methodName = 'getThreadStateByNonce';
                 isHexStrict = { presence: true, isHexStrict: true };
@@ -4639,8 +4583,46 @@ var Connext = function () {
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
                 Connext.validatorsResponseToError(validate.single(nonce, isPositiveInt), methodName, 'nonce');
-                _context32.next = 7;
+                _context31.next = 7;
                 return this.networking.get('virtualchannel/' + channelId + '/update/nonce/' + nonce);
+
+              case 7:
+                response = _context31.sent;
+                return _context31.abrupt('return', response.data);
+
+              case 9:
+              case 'end':
+                return _context31.stop();
+            }
+          }
+        }, _callee31, this);
+      }));
+
+      function getThreadStateByNonce(_x50) {
+        return _ref51.apply(this, arguments);
+      }
+
+      return getThreadStateByNonce;
+    }()
+  }, {
+    key: 'getChannelStateByNonce',
+    value: function () {
+      var _ref53 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee32(_ref52) {
+        var channelId = _ref52.channelId,
+            nonce = _ref52.nonce;
+        var methodName, isHexStrict, isPositiveInt, response;
+        return _regenerator2.default.wrap(function _callee32$(_context32) {
+          while (1) {
+            switch (_context32.prev = _context32.next) {
+              case 0:
+                methodName = 'getChannelStateByNonce';
+                isHexStrict = { presence: true, isHexStrict: true };
+                isPositiveInt = { presence: true, isPositiveInt: true };
+
+                Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
+                Connext.validatorsResponseToError(validate.single(nonce, isPositiveInt), methodName, 'nonce');
+                _context32.next = 7;
+                return this.networking.get('ledgerchannel/' + channelId + '/update/nonce/' + nonce);
 
               case 7:
                 response = _context32.sent;
@@ -4654,46 +4636,8 @@ var Connext = function () {
         }, _callee32, this);
       }));
 
-      function getThreadStateByNonce(_x52) {
-        return _ref52.apply(this, arguments);
-      }
-
-      return getThreadStateByNonce;
-    }()
-  }, {
-    key: 'getChannelStateByNonce',
-    value: function () {
-      var _ref54 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee33(_ref53) {
-        var channelId = _ref53.channelId,
-            nonce = _ref53.nonce;
-        var methodName, isHexStrict, isPositiveInt, response;
-        return _regenerator2.default.wrap(function _callee33$(_context33) {
-          while (1) {
-            switch (_context33.prev = _context33.next) {
-              case 0:
-                methodName = 'getChannelStateByNonce';
-                isHexStrict = { presence: true, isHexStrict: true };
-                isPositiveInt = { presence: true, isPositiveInt: true };
-
-                Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
-                Connext.validatorsResponseToError(validate.single(nonce, isPositiveInt), methodName, 'nonce');
-                _context33.next = 7;
-                return this.networking.get('ledgerchannel/' + channelId + '/update/nonce/' + nonce);
-
-              case 7:
-                response = _context33.sent;
-                return _context33.abrupt('return', response.data);
-
-              case 9:
-              case 'end':
-                return _context33.stop();
-            }
-          }
-        }, _callee33, this);
-      }));
-
-      function getChannelStateByNonce(_x53) {
-        return _ref54.apply(this, arguments);
+      function getChannelStateByNonce(_x51) {
+        return _ref53.apply(this, arguments);
       }
 
       return getChannelStateByNonce;
@@ -4701,12 +4645,12 @@ var Connext = function () {
   }, {
     key: 'getLatestChannelState',
     value: function () {
-      var _ref55 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee34(channelId) {
+      var _ref54 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee33(channelId) {
         var sigs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isHexStrict, response;
-        return _regenerator2.default.wrap(function _callee34$(_context34) {
+        return _regenerator2.default.wrap(function _callee33$(_context33) {
           while (1) {
-            switch (_context34.prev = _context34.next) {
+            switch (_context33.prev = _context33.next) {
               case 0:
                 // lcState == latest ingrid signed state
                 methodName = 'getLatestChannelState';
@@ -4717,23 +4661,23 @@ var Connext = function () {
                   sigs = ['sigI', 'sigA'];
                 }
 
-                _context34.next = 6;
+                _context33.next = 6;
                 return this.networking.get('ledgerchannel/' + channelId + '/update/latest?sig[]=sigI');
 
               case 6:
-                response = _context34.sent;
-                return _context34.abrupt('return', response.data);
+                response = _context33.sent;
+                return _context33.abrupt('return', response.data);
 
               case 8:
               case 'end':
-                return _context34.stop();
+                return _context33.stop();
             }
           }
-        }, _callee34, this);
+        }, _callee33, this);
       }));
 
-      function getLatestChannelState(_x55) {
-        return _ref55.apply(this, arguments);
+      function getLatestChannelState(_x53) {
+        return _ref54.apply(this, arguments);
       }
 
       return getLatestChannelState;
@@ -4749,11 +4693,11 @@ var Connext = function () {
   }, {
     key: 'getThreadsByChannelId',
     value: function () {
-      var _ref56 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee35(channelId) {
+      var _ref55 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee34(channelId) {
         var methodName, isHexStrict, response;
-        return _regenerator2.default.wrap(function _callee35$(_context35) {
+        return _regenerator2.default.wrap(function _callee34$(_context34) {
           while (1) {
-            switch (_context35.prev = _context35.next) {
+            switch (_context34.prev = _context34.next) {
               case 0:
                 // lcState == latest ingrid signed state
                 methodName = 'getThreadsByChannelId';
@@ -4761,23 +4705,23 @@ var Connext = function () {
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
 
-                _context35.next = 5;
+                _context34.next = 5;
                 return this.networking.get('ledgerchannel/' + channelId + '/vcs');
 
               case 5:
-                response = _context35.sent;
-                return _context35.abrupt('return', response.data);
+                response = _context34.sent;
+                return _context34.abrupt('return', response.data);
 
               case 7:
               case 'end':
-                return _context35.stop();
+                return _context34.stop();
             }
           }
-        }, _callee35, this);
+        }, _callee34, this);
       }));
 
-      function getThreadsByChannelId(_x56) {
-        return _ref56.apply(this, arguments);
+      function getThreadsByChannelId(_x54) {
+        return _ref55.apply(this, arguments);
       }
 
       return getThreadsByChannelId;
@@ -4796,32 +4740,32 @@ var Connext = function () {
   }, {
     key: 'getChannelIdByPartyA',
     value: function () {
-      var _ref57 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee36() {
+      var _ref56 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee35() {
         var partyA = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var status = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isAddress, accounts, response;
-        return _regenerator2.default.wrap(function _callee36$(_context36) {
+        return _regenerator2.default.wrap(function _callee35$(_context35) {
           while (1) {
-            switch (_context36.prev = _context36.next) {
+            switch (_context35.prev = _context35.next) {
               case 0:
                 methodName = 'getChannelIdByPartyA';
                 isAddress = { presence: true, isAddress: true };
 
                 if (!partyA) {
-                  _context36.next = 6;
+                  _context35.next = 6;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(partyA, isAddress), methodName, 'partyA');
-                _context36.next = 10;
+                _context35.next = 10;
                 break;
 
               case 6:
-                _context36.next = 8;
+                _context35.next = 8;
                 return this.web3.eth.getAccounts();
 
               case 8:
-                accounts = _context36.sent;
+                accounts = _context35.sent;
 
                 partyA = accounts[0].toLowerCase();
 
@@ -4832,34 +4776,34 @@ var Connext = function () {
                   status = Object.keys(CHANNEL_STATES)[1];
                 }
                 // get my LC with ingrid
-                _context36.next = 13;
+                _context35.next = 13;
                 return this.networking.get('ledgerchannel/a/' + partyA + '?status=' + status);
 
               case 13:
-                response = _context36.sent;
+                response = _context35.sent;
 
                 if (!(status === Object.keys(CHANNEL_STATES)[1])) {
-                  _context36.next = 18;
+                  _context35.next = 18;
                   break;
                 }
 
-                return _context36.abrupt('return', response.data[0].channelId);
+                return _context35.abrupt('return', response.data[0].channelId);
 
               case 18:
-                return _context36.abrupt('return', response.data.map(function (val) {
+                return _context35.abrupt('return', response.data.map(function (val) {
                   return val.channelId;
                 }));
 
               case 19:
               case 'end':
-                return _context36.stop();
+                return _context35.stop();
             }
           }
-        }, _callee36, this);
+        }, _callee35, this);
       }));
 
       function getChannelIdByPartyA() {
-        return _ref57.apply(this, arguments);
+        return _ref56.apply(this, arguments);
       }
 
       return getChannelIdByPartyA;
@@ -4875,48 +4819,48 @@ var Connext = function () {
   }, {
     key: 'getThreadById',
     value: function () {
-      var _ref58 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee37(threadId) {
+      var _ref57 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee36(threadId) {
         var methodName, isHexStrict, response;
-        return _regenerator2.default.wrap(function _callee37$(_context37) {
+        return _regenerator2.default.wrap(function _callee36$(_context36) {
           while (1) {
-            switch (_context37.prev = _context37.next) {
+            switch (_context36.prev = _context36.next) {
               case 0:
                 methodName = 'getThreadById';
                 isHexStrict = { presence: true, isHexStrict: true };
 
                 Connext.validatorsResponseToError(validate.single(threadId, isHexStrict), methodName, 'threadId');
-                _context37.prev = 3;
-                _context37.next = 6;
+                _context36.prev = 3;
+                _context36.next = 6;
                 return this.networking.get('virtualchannel/' + threadId);
 
               case 6:
-                response = _context37.sent;
-                return _context37.abrupt('return', response.data);
+                response = _context36.sent;
+                return _context36.abrupt('return', response.data);
 
               case 10:
-                _context37.prev = 10;
-                _context37.t0 = _context37['catch'](3);
+                _context36.prev = 10;
+                _context36.t0 = _context36['catch'](3);
 
-                if (!(_context37.t0.status === 400)) {
-                  _context37.next = 16;
+                if (!(_context36.t0.status === 400)) {
+                  _context36.next = 16;
                   break;
                 }
 
-                return _context37.abrupt('return', null);
+                return _context36.abrupt('return', null);
 
               case 16:
-                throw _context37.t0;
+                throw _context36.t0;
 
               case 17:
               case 'end':
-                return _context37.stop();
+                return _context36.stop();
             }
           }
-        }, _callee37, this, [[3, 10]]);
+        }, _callee36, this, [[3, 10]]);
       }));
 
-      function getThreadById(_x59) {
-        return _ref58.apply(this, arguments);
+      function getThreadById(_x57) {
+        return _ref57.apply(this, arguments);
       }
 
       return getThreadById;
@@ -4934,13 +4878,13 @@ var Connext = function () {
   }, {
     key: 'getThreadByParties',
     value: function () {
-      var _ref60 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee38(_ref59) {
-        var partyA = _ref59.partyA,
-            partyB = _ref59.partyB;
+      var _ref59 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee37(_ref58) {
+        var partyA = _ref58.partyA,
+            partyB = _ref58.partyB;
         var methodName, isAddress, openResponse;
-        return _regenerator2.default.wrap(function _callee38$(_context38) {
+        return _regenerator2.default.wrap(function _callee37$(_context37) {
           while (1) {
-            switch (_context38.prev = _context38.next) {
+            switch (_context37.prev = _context37.next) {
               case 0:
                 methodName = 'getThreadByParties';
                 isAddress = { presence: true, isAddress: true };
@@ -4948,89 +4892,89 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(partyA, isAddress), methodName, 'partyA');
                 Connext.validatorsResponseToError(validate.single(partyB, isAddress), methodName, 'partyB');
                 openResponse = void 0;
-                _context38.prev = 5;
-                _context38.next = 8;
+                _context37.prev = 5;
+                _context37.next = 8;
                 return this.networking.get('virtualchannel/a/' + partyA.toLowerCase() + '/b/' + partyB.toLowerCase() + '/open');
 
               case 8:
-                openResponse = _context38.sent;
+                openResponse = _context37.sent;
 
                 if (!(openResponse.data.length === 0)) {
-                  _context38.next = 13;
+                  _context37.next = 13;
                   break;
                 }
 
                 openResponse = null;
-                _context38.next = 14;
+                _context37.next = 14;
                 break;
 
               case 13:
-                return _context38.abrupt('return', openResponse.data);
+                return _context37.abrupt('return', openResponse.data);
 
               case 14:
-                _context38.next = 19;
+                _context37.next = 19;
                 break;
 
               case 16:
-                _context38.prev = 16;
-                _context38.t0 = _context38['catch'](5);
+                _context37.prev = 16;
+                _context37.t0 = _context37['catch'](5);
 
-                if (_context38.t0.status === 400) {
+                if (_context37.t0.status === 400) {
                   // no open channel
                   openResponse = null;
                 }
 
               case 19:
                 if (!(openResponse === null)) {
-                  _context38.next = 34;
+                  _context37.next = 34;
                   break;
                 }
 
-                _context38.prev = 20;
-                _context38.next = 23;
+                _context37.prev = 20;
+                _context37.next = 23;
                 return this.networking.get('virtualchannel/address/' + partyA.toLowerCase() + '/opening');
 
               case 23:
-                openResponse = _context38.sent;
+                openResponse = _context37.sent;
 
                 if (!(openResponse.data.length === 0)) {
-                  _context38.next = 28;
+                  _context37.next = 28;
                   break;
                 }
 
                 openResponse = null;
-                _context38.next = 29;
+                _context37.next = 29;
                 break;
 
               case 28:
-                return _context38.abrupt('return', openResponse.data);
+                return _context37.abrupt('return', openResponse.data);
 
               case 29:
-                _context38.next = 34;
+                _context37.next = 34;
                 break;
 
               case 31:
-                _context38.prev = 31;
-                _context38.t1 = _context38['catch'](20);
+                _context37.prev = 31;
+                _context37.t1 = _context37['catch'](20);
 
-                if (_context38.t1.status === 400) {
+                if (_context37.t1.status === 400) {
                   // no open channel
                   openResponse = null;
                 }
 
               case 34:
-                return _context38.abrupt('return', openResponse);
+                return _context37.abrupt('return', openResponse);
 
               case 35:
               case 'end':
-                return _context38.stop();
+                return _context37.stop();
             }
           }
-        }, _callee38, this, [[5, 16], [20, 31]]);
+        }, _callee37, this, [[5, 16], [20, 31]]);
       }));
 
-      function getThreadByParties(_x60) {
-        return _ref60.apply(this, arguments);
+      function getThreadByParties(_x58) {
+        return _ref59.apply(this, arguments);
       }
 
       return getThreadByParties;
@@ -5038,34 +4982,34 @@ var Connext = function () {
   }, {
     key: 'getOtherSubchanId',
     value: function () {
-      var _ref61 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee39(threadId) {
+      var _ref60 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee38(threadId) {
         var methodName, isHexStrict, thread;
-        return _regenerator2.default.wrap(function _callee39$(_context39) {
+        return _regenerator2.default.wrap(function _callee38$(_context38) {
           while (1) {
-            switch (_context39.prev = _context39.next) {
+            switch (_context38.prev = _context38.next) {
               case 0:
                 methodName = 'getOtherSubchanId';
                 isHexStrict = { presence: true, isHexStrict: true };
 
                 Connext.validatorsResponseToError(validate.single(threadId, isHexStrict), methodName, 'threadId');
                 // get LC for other VC party and ingrid
-                _context39.next = 5;
+                _context38.next = 5;
                 return this.getThreadById(threadId);
 
               case 5:
-                thread = _context39.sent;
-                return _context39.abrupt('return', thread.subchanBI);
+                thread = _context38.sent;
+                return _context38.abrupt('return', thread.subchanBI);
 
               case 7:
               case 'end':
-                return _context39.stop();
+                return _context38.stop();
             }
           }
-        }, _callee39, this);
+        }, _callee38, this);
       }));
 
-      function getOtherSubchanId(_x61) {
-        return _ref61.apply(this, arguments);
+      function getOtherSubchanId(_x59) {
+        return _ref60.apply(this, arguments);
       }
 
       return getOtherSubchanId;
@@ -5081,48 +5025,48 @@ var Connext = function () {
   }, {
     key: 'getChannelById',
     value: function () {
-      var _ref62 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee40(channelId) {
+      var _ref61 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee39(channelId) {
         var methodName, isHexStrict, res;
-        return _regenerator2.default.wrap(function _callee40$(_context40) {
+        return _regenerator2.default.wrap(function _callee39$(_context39) {
           while (1) {
-            switch (_context40.prev = _context40.next) {
+            switch (_context39.prev = _context39.next) {
               case 0:
                 methodName = 'getChannelById';
                 isHexStrict = { presence: true, isHexStrict: true };
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
-                _context40.prev = 3;
-                _context40.next = 6;
+                _context39.prev = 3;
+                _context39.next = 6;
                 return this.networking.get('ledgerchannel/' + channelId);
 
               case 6:
-                res = _context40.sent;
-                return _context40.abrupt('return', res.data);
+                res = _context39.sent;
+                return _context39.abrupt('return', res.data);
 
               case 10:
-                _context40.prev = 10;
-                _context40.t0 = _context40['catch'](3);
+                _context39.prev = 10;
+                _context39.t0 = _context39['catch'](3);
 
-                if (!(_context40.t0.status === 404)) {
-                  _context40.next = 14;
+                if (!(_context39.t0.status === 404)) {
+                  _context39.next = 14;
                   break;
                 }
 
-                return _context40.abrupt('return', null);
+                return _context39.abrupt('return', null);
 
               case 14:
-                throw _context40.t0;
+                throw _context39.t0;
 
               case 15:
               case 'end':
-                return _context40.stop();
+                return _context39.stop();
             }
           }
-        }, _callee40, this, [[3, 10]]);
+        }, _callee39, this, [[3, 10]]);
       }));
 
-      function getChannelById(_x62) {
-        return _ref62.apply(this, arguments);
+      function getChannelById(_x60) {
+        return _ref61.apply(this, arguments);
       }
 
       return getChannelById;
@@ -5139,33 +5083,33 @@ var Connext = function () {
   }, {
     key: 'getChannelByPartyA',
     value: function () {
-      var _ref63 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee41() {
+      var _ref62 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee40() {
         var partyA = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var status = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isChannelStatus, isAddress, accounts, response;
-        return _regenerator2.default.wrap(function _callee41$(_context41) {
+        return _regenerator2.default.wrap(function _callee40$(_context40) {
           while (1) {
-            switch (_context41.prev = _context41.next) {
+            switch (_context40.prev = _context40.next) {
               case 0:
                 methodName = 'getChannelByPartyA';
                 isChannelStatus = { presence: true, isChannelStatus: true };
                 isAddress = { presence: true, isAddress: true };
 
                 if (!(partyA !== null)) {
-                  _context41.next = 7;
+                  _context40.next = 7;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(partyA, isAddress), methodName, 'partyA');
-                _context41.next = 11;
+                _context40.next = 11;
                 break;
 
               case 7:
-                _context41.next = 9;
+                _context40.next = 9;
                 return this.web3.eth.getAccounts();
 
               case 9:
-                accounts = _context41.sent;
+                accounts = _context40.sent;
 
                 partyA = accounts[0];
 
@@ -5176,32 +5120,32 @@ var Connext = function () {
                   status = Object.keys(CHANNEL_STATES)[1];
                 }
 
-                _context41.next = 14;
+                _context40.next = 14;
                 return this.networking.get('ledgerchannel/a/' + partyA.toLowerCase() + '?status=' + status);
 
               case 14:
-                response = _context41.sent;
+                response = _context40.sent;
 
                 if (!(status === Object.keys(CHANNEL_STATES)[1])) {
-                  _context41.next = 19;
+                  _context40.next = 19;
                   break;
                 }
 
-                return _context41.abrupt('return', response.data[0]);
+                return _context40.abrupt('return', response.data[0]);
 
               case 19:
-                return _context41.abrupt('return', response.data);
+                return _context40.abrupt('return', response.data);
 
               case 20:
               case 'end':
-                return _context41.stop();
+                return _context40.stop();
             }
           }
-        }, _callee41, this);
+        }, _callee40, this);
       }));
 
       function getChannelByPartyA() {
-        return _ref63.apply(this, arguments);
+        return _ref62.apply(this, arguments);
       }
 
       return getChannelByPartyA;
@@ -5209,29 +5153,29 @@ var Connext = function () {
   }, {
     key: 'getChallengeTimer',
     value: function () {
-      var _ref64 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee42() {
+      var _ref63 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee41() {
         var response;
-        return _regenerator2.default.wrap(function _callee42$(_context42) {
+        return _regenerator2.default.wrap(function _callee41$(_context41) {
           while (1) {
-            switch (_context42.prev = _context42.next) {
+            switch (_context41.prev = _context41.next) {
               case 0:
-                _context42.next = 2;
+                _context41.next = 2;
                 return this.networking.get('ledgerchannel/challenge');
 
               case 2:
-                response = _context42.sent;
-                return _context42.abrupt('return', response.data.challenge);
+                response = _context41.sent;
+                return _context41.abrupt('return', response.data.challenge);
 
               case 4:
               case 'end':
-                return _context42.stop();
+                return _context41.stop();
             }
           }
-        }, _callee42, this);
+        }, _callee41, this);
       }));
 
       function getChallengeTimer() {
-        return _ref64.apply(this, arguments);
+        return _ref63.apply(this, arguments);
       }
 
       return getChallengeTimer;
@@ -5239,22 +5183,57 @@ var Connext = function () {
   }, {
     key: 'getContractAddress',
     value: function () {
+      var _ref64 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee42(channelId) {
+        var methodName, isHexStrict, response;
+        return _regenerator2.default.wrap(function _callee42$(_context42) {
+          while (1) {
+            switch (_context42.prev = _context42.next) {
+              case 0:
+                methodName = 'getLatestThreadState';
+                isHexStrict = { presence: true, isHexStrict: true };
+
+                Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
+                _context42.next = 5;
+                return this.networking.get('ledgerchannel/' + channelId + '/contract');
+
+              case 5:
+                response = _context42.sent;
+                return _context42.abrupt('return', response.data.address);
+
+              case 7:
+              case 'end':
+                return _context42.stop();
+            }
+          }
+        }, _callee42, this);
+      }));
+
+      function getContractAddress(_x63) {
+        return _ref64.apply(this, arguments);
+      }
+
+      return getContractAddress;
+    }()
+  }, {
+    key: 'getLatestThreadState',
+    value: function () {
       var _ref65 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee43(channelId) {
         var methodName, isHexStrict, response;
         return _regenerator2.default.wrap(function _callee43$(_context43) {
           while (1) {
             switch (_context43.prev = _context43.next) {
               case 0:
+                // validate params
                 methodName = 'getLatestThreadState';
                 isHexStrict = { presence: true, isHexStrict: true };
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
                 _context43.next = 5;
-                return this.networking.get('ledgerchannel/' + channelId + '/contract');
+                return this.networking.get('virtualchannel/' + channelId + '/update/latest');
 
               case 5:
                 response = _context43.sent;
-                return _context43.abrupt('return', response.data.address);
+                return _context43.abrupt('return', response.data);
 
               case 7:
               case 'end':
@@ -5264,14 +5243,14 @@ var Connext = function () {
         }, _callee43, this);
       }));
 
-      function getContractAddress(_x65) {
+      function getLatestThreadState(_x64) {
         return _ref65.apply(this, arguments);
       }
 
-      return getContractAddress;
+      return getLatestThreadState;
     }()
   }, {
-    key: 'getLatestThreadState',
+    key: 'getThreadInitialStates',
     value: function () {
       var _ref66 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee44(channelId) {
         var methodName, isHexStrict, response;
@@ -5280,12 +5259,12 @@ var Connext = function () {
             switch (_context44.prev = _context44.next) {
               case 0:
                 // validate params
-                methodName = 'getLatestThreadState';
+                methodName = 'getThreadInitialStates';
                 isHexStrict = { presence: true, isHexStrict: true };
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
                 _context44.next = 5;
-                return this.networking.get('virtualchannel/' + channelId + '/update/latest');
+                return this.networking.get('ledgerchannel/' + channelId + '/vcinitialstates');
 
               case 5:
                 response = _context44.sent;
@@ -5299,28 +5278,28 @@ var Connext = function () {
         }, _callee44, this);
       }));
 
-      function getLatestThreadState(_x66) {
+      function getThreadInitialStates(_x65) {
         return _ref66.apply(this, arguments);
       }
 
-      return getLatestThreadState;
+      return getThreadInitialStates;
     }()
   }, {
-    key: 'getThreadInitialStates',
+    key: 'getThreadInitialState',
     value: function () {
-      var _ref67 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee45(channelId) {
+      var _ref67 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee45(threadId) {
         var methodName, isHexStrict, response;
         return _regenerator2.default.wrap(function _callee45$(_context45) {
           while (1) {
             switch (_context45.prev = _context45.next) {
               case 0:
                 // validate params
-                methodName = 'getThreadInitialStates';
+                methodName = 'getThreadInitialState';
                 isHexStrict = { presence: true, isHexStrict: true };
 
-                Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
+                Connext.validatorsResponseToError(validate.single(threadId, isHexStrict), methodName, 'threadId');
                 _context45.next = 5;
-                return this.networking.get('ledgerchannel/' + channelId + '/vcinitialstates');
+                return this.networking.get('virtualchannel/' + threadId + '/update/nonce/0');
 
               case 5:
                 response = _context45.sent;
@@ -5334,14 +5313,14 @@ var Connext = function () {
         }, _callee45, this);
       }));
 
-      function getThreadInitialStates(_x67) {
+      function getThreadInitialState(_x66) {
         return _ref67.apply(this, arguments);
       }
 
-      return getThreadInitialStates;
+      return getThreadInitialState;
     }()
   }, {
-    key: 'getThreadInitialState',
+    key: 'getDecomposedChannelStates',
     value: function () {
       var _ref68 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee46(threadId) {
         var methodName, isHexStrict, response;
@@ -5350,12 +5329,12 @@ var Connext = function () {
             switch (_context46.prev = _context46.next) {
               case 0:
                 // validate params
-                methodName = 'getThreadInitialState';
+                methodName = 'getDecomposedChannelStates';
                 isHexStrict = { presence: true, isHexStrict: true };
 
                 Connext.validatorsResponseToError(validate.single(threadId, isHexStrict), methodName, 'threadId');
                 _context46.next = 5;
-                return this.networking.get('virtualchannel/' + threadId + '/update/nonce/0');
+                return this.networking.get('virtualchannel/' + threadId + '/decompose');
 
               case 5:
                 response = _context46.sent;
@@ -5369,43 +5348,8 @@ var Connext = function () {
         }, _callee46, this);
       }));
 
-      function getThreadInitialState(_x68) {
+      function getDecomposedChannelStates(_x67) {
         return _ref68.apply(this, arguments);
-      }
-
-      return getThreadInitialState;
-    }()
-  }, {
-    key: 'getDecomposedChannelStates',
-    value: function () {
-      var _ref69 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee47(threadId) {
-        var methodName, isHexStrict, response;
-        return _regenerator2.default.wrap(function _callee47$(_context47) {
-          while (1) {
-            switch (_context47.prev = _context47.next) {
-              case 0:
-                // validate params
-                methodName = 'getDecomposedChannelStates';
-                isHexStrict = { presence: true, isHexStrict: true };
-
-                Connext.validatorsResponseToError(validate.single(threadId, isHexStrict), methodName, 'threadId');
-                _context47.next = 5;
-                return this.networking.get('virtualchannel/' + threadId + '/decompose');
-
-              case 5:
-                response = _context47.sent;
-                return _context47.abrupt('return', response.data);
-
-              case 7:
-              case 'end':
-                return _context47.stop();
-            }
-          }
-        }, _callee47, this);
-      }));
-
-      function getDecomposedChannelStates(_x69) {
-        return _ref69.apply(this, arguments);
       }
 
       return getDecomposedChannelStates;
@@ -5430,13 +5374,13 @@ var Connext = function () {
   }, {
     key: 'requestHubDeposit',
     value: function () {
-      var _ref71 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee48(_ref70) {
-        var channelId = _ref70.channelId,
-            deposit = _ref70.deposit;
+      var _ref70 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee47(_ref69) {
+        var channelId = _ref69.channelId,
+            deposit = _ref69.deposit;
         var methodName, isHexStrict, isValidDepositObject, accountBalance, response;
-        return _regenerator2.default.wrap(function _callee48$(_context48) {
+        return _regenerator2.default.wrap(function _callee47$(_context47) {
           while (1) {
-            switch (_context48.prev = _context48.next) {
+            switch (_context47.prev = _context47.next) {
               case 0:
                 methodName = 'requestHubDeposit';
                 isHexStrict = { presence: true, isHexStrict: true };
@@ -5444,40 +5388,40 @@ var Connext = function () {
 
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
                 Connext.validatorsResponseToError(validate.single(deposit, isValidDepositObject), methodName, 'deposit');
-                _context48.next = 7;
+                _context47.next = 7;
                 return this.web3.eth.getBalance(this.ingridAddress);
 
               case 7:
-                accountBalance = _context48.sent;
+                accountBalance = _context47.sent;
 
                 if (!(deposit.ethDeposit && deposit.ethDeposit.gt(Web3.utils.toBN(accountBalance)))) {
-                  _context48.next = 10;
+                  _context47.next = 10;
                   break;
                 }
 
                 throw new ChannelUpdateError(methodName, 'Hub does not have sufficient ETH balance for requested deposit');
 
               case 10:
-                _context48.next = 12;
+                _context47.next = 12;
                 return this.networking.post('ledgerchannel/' + channelId + '/requestdeposit', {
                   ethDeposit: deposit.ethDeposit ? deposit.ethDeposit.toString() : '0',
                   tokenDeposit: deposit.tokenDeposit ? deposit.tokenDeposit.toString() : '0'
                 });
 
               case 12:
-                response = _context48.sent;
-                return _context48.abrupt('return', response.data.txHash);
+                response = _context47.sent;
+                return _context47.abrupt('return', response.data.txHash);
 
               case 14:
               case 'end':
-                return _context48.stop();
+                return _context47.stop();
             }
           }
-        }, _callee48, this);
+        }, _callee47, this);
       }));
 
-      function requestHubDeposit(_x70) {
-        return _ref71.apply(this, arguments);
+      function requestHubDeposit(_x68) {
+        return _ref70.apply(this, arguments);
       }
 
       return requestHubDeposit;
@@ -5488,14 +5432,14 @@ var Connext = function () {
   }, {
     key: 'joinThreadHandler',
     value: function () {
-      var _ref73 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee49(_ref72) {
-        var subchanSig = _ref72.subchanSig,
-            threadSig = _ref72.threadSig,
-            channelId = _ref72.channelId;
+      var _ref72 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee48(_ref71) {
+        var subchanSig = _ref71.subchanSig,
+            threadSig = _ref71.threadSig,
+            channelId = _ref71.channelId;
         var methodName, isHexStrict, isHex, response;
-        return _regenerator2.default.wrap(function _callee49$(_context49) {
+        return _regenerator2.default.wrap(function _callee48$(_context48) {
           while (1) {
-            switch (_context49.prev = _context49.next) {
+            switch (_context48.prev = _context48.next) {
               case 0:
                 // validate params
                 methodName = 'joinThreadHandler';
@@ -5506,26 +5450,26 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(subchanSig, isHex), methodName, 'subchanSig');
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
                 // ingrid should verify vcS0A and vcS0b
-                _context49.next = 8;
+                _context48.next = 8;
                 return this.networking.post('virtualchannel/' + channelId + '/join', {
                   vcSig: threadSig,
                   lcSig: subchanSig
                 });
 
               case 8:
-                response = _context49.sent;
-                return _context49.abrupt('return', response.data.channelId);
+                response = _context48.sent;
+                return _context48.abrupt('return', response.data.channelId);
 
               case 10:
               case 'end':
-                return _context49.stop();
+                return _context48.stop();
             }
           }
-        }, _callee49, this);
+        }, _callee48, this);
       }));
 
-      function joinThreadHandler(_x71) {
-        return _ref73.apply(this, arguments);
+      function joinThreadHandler(_x69) {
+        return _ref72.apply(this, arguments);
       }
 
       return joinThreadHandler;
@@ -5533,14 +5477,14 @@ var Connext = function () {
   }, {
     key: 'fastCloseThreadHandler',
     value: function () {
-      var _ref75 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee50(_ref74) {
-        var sig = _ref74.sig,
-            signer = _ref74.signer,
-            channelId = _ref74.channelId;
+      var _ref74 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee49(_ref73) {
+        var sig = _ref73.sig,
+            signer = _ref73.signer,
+            channelId = _ref73.channelId;
         var methodName, isHex, isHexStrict, isAddress, response;
-        return _regenerator2.default.wrap(function _callee50$(_context50) {
+        return _regenerator2.default.wrap(function _callee49$(_context49) {
           while (1) {
-            switch (_context50.prev = _context50.next) {
+            switch (_context49.prev = _context49.next) {
               case 0:
                 // validate params
                 methodName = 'fastCloseThreadHandler';
@@ -5552,35 +5496,35 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(signer, isAddress), methodName, 'signer');
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
 
-                _context50.next = 9;
+                _context49.next = 9;
                 return this.networking.post('virtualchannel/' + channelId + '/close', {
                   sig: sig,
                   signer: signer
                 });
 
               case 9:
-                response = _context50.sent;
+                response = _context49.sent;
 
                 if (!response.data.sigI) {
-                  _context50.next = 14;
+                  _context49.next = 14;
                   break;
                 }
 
-                return _context50.abrupt('return', response.data.sigI);
+                return _context49.abrupt('return', response.data.sigI);
 
               case 14:
-                return _context50.abrupt('return', false);
+                return _context49.abrupt('return', false);
 
               case 15:
               case 'end':
-                return _context50.stop();
+                return _context49.stop();
             }
           }
-        }, _callee50, this);
+        }, _callee49, this);
       }));
 
-      function fastCloseThreadHandler(_x72) {
-        return _ref75.apply(this, arguments);
+      function fastCloseThreadHandler(_x70) {
+        return _ref74.apply(this, arguments);
       }
 
       return fastCloseThreadHandler;
@@ -5588,13 +5532,13 @@ var Connext = function () {
   }, {
     key: 'fastCloseChannelHandler',
     value: function () {
-      var _ref77 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee51(_ref76) {
-        var sig = _ref76.sig,
-            channelId = _ref76.channelId;
+      var _ref76 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee50(_ref75) {
+        var sig = _ref75.sig,
+            channelId = _ref75.channelId;
         var methodName, isHexStrict, isHex, response;
-        return _regenerator2.default.wrap(function _callee51$(_context51) {
+        return _regenerator2.default.wrap(function _callee50$(_context50) {
           while (1) {
-            switch (_context51.prev = _context51.next) {
+            switch (_context50.prev = _context50.next) {
               case 0:
                 // validate params
                 methodName = 'fastCloseChannelHandler';
@@ -5603,25 +5547,25 @@ var Connext = function () {
 
                 Connext.validatorsResponseToError(validate.single(sig, isHex), methodName, 'sig');
                 Connext.validatorsResponseToError(validate.single(channelId, isHexStrict), methodName, 'channelId');
-                _context51.next = 7;
+                _context50.next = 7;
                 return this.networking.post('ledgerchannel/' + channelId + '/fastclose', {
                   sig: sig
                 });
 
               case 7:
-                response = _context51.sent;
-                return _context51.abrupt('return', response.data);
+                response = _context50.sent;
+                return _context50.abrupt('return', response.data);
 
               case 9:
               case 'end':
-                return _context51.stop();
+                return _context50.stop();
             }
           }
-        }, _callee51, this);
+        }, _callee50, this);
       }));
 
-      function fastCloseChannelHandler(_x73) {
-        return _ref77.apply(this, arguments);
+      function fastCloseChannelHandler(_x71) {
+        return _ref76.apply(this, arguments);
       }
 
       return fastCloseChannelHandler;
@@ -5629,15 +5573,15 @@ var Connext = function () {
   }, {
     key: 'createChannelUpdateOnThreadOpen',
     value: function () {
-      var _ref79 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee52(_ref78) {
-        var threadInitialState = _ref78.threadInitialState,
-            channel = _ref78.channel,
-            _ref78$signer = _ref78.signer,
-            signer = _ref78$signer === undefined ? null : _ref78$signer;
+      var _ref78 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee51(_ref77) {
+        var threadInitialState = _ref77.threadInitialState,
+            channel = _ref77.channel,
+            _ref77$signer = _ref77.signer,
+            signer = _ref77$signer === undefined ? null : _ref77$signer;
         var methodName, isThreadState, isChannelObj, isAddress, accounts, thread, threadInitialStates, newRootHash, channelEthBalanceA, channelTokenBalanceA, channelTokenBalanceI, channelEthBalanceI, updateAtoI, sigAtoI;
-        return _regenerator2.default.wrap(function _callee52$(_context52) {
+        return _regenerator2.default.wrap(function _callee51$(_context51) {
           while (1) {
-            switch (_context52.prev = _context52.next) {
+            switch (_context51.prev = _context51.next) {
               case 0:
                 methodName = 'createChannelUpdateOnThreadOpen';
                 isThreadState = { presence: true, isThreadState: true };
@@ -5648,26 +5592,26 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(channel, isChannelObj), methodName, 'channel');
 
                 if (!signer) {
-                  _context52.next = 10;
+                  _context51.next = 10;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(signer, isAddress), methodName, 'signer');
-                _context52.next = 14;
+                _context51.next = 14;
                 break;
 
               case 10:
-                _context52.next = 12;
+                _context51.next = 12;
                 return this.web3.eth.getAccounts();
 
               case 12:
-                accounts = _context52.sent;
+                accounts = _context51.sent;
 
                 signer = accounts[0].toLowerCase();
 
               case 14:
                 if (!(signer.toLowerCase() !== channel.partyA)) {
-                  _context52.next = 16;
+                  _context51.next = 16;
                   break;
                 }
 
@@ -5675,7 +5619,7 @@ var Connext = function () {
 
               case 16:
                 if (!(signer.toLowerCase() !== threadInitialState.partyA.toLowerCase() && signer.toLowerCase() !== threadInitialState.partyB.toLowerCase())) {
-                  _context52.next = 18;
+                  _context51.next = 18;
                   break;
                 }
 
@@ -5683,21 +5627,21 @@ var Connext = function () {
 
               case 18:
                 if (!(CHANNEL_STATES[channel.state] !== 1)) {
-                  _context52.next = 20;
+                  _context51.next = 20;
                   break;
                 }
 
                 throw new ThreadOpenError(methodName, 'Invalid subchannel state');
 
               case 20:
-                _context52.next = 22;
+                _context51.next = 22;
                 return this.getThreadById(threadInitialState.channelId);
 
               case 22:
-                thread = _context52.sent;
+                thread = _context51.sent;
 
                 if (!(thread && THREAD_STATES[thread.state] !== 0)) {
-                  _context52.next = 25;
+                  _context51.next = 25;
                   break;
                 }
 
@@ -5705,7 +5649,7 @@ var Connext = function () {
 
               case 25:
                 if (!(threadInitialState.nonce !== 0)) {
-                  _context52.next = 27;
+                  _context51.next = 27;
                   break;
                 }
 
@@ -5713,7 +5657,7 @@ var Connext = function () {
 
               case 27:
                 if (!(threadInitialState.balanceA.ethDeposit && Web3.utils.toBN(channel.ethBalanceA).lt(threadInitialState.balanceA.ethDeposit))) {
-                  _context52.next = 29;
+                  _context51.next = 29;
                   break;
                 }
 
@@ -5721,7 +5665,7 @@ var Connext = function () {
 
               case 29:
                 if (!(threadInitialState.balanceA.tokenDeposit && Web3.utils.toBN(channel.tokenBalanceA).lt(threadInitialState.balanceA.tokenDeposit))) {
-                  _context52.next = 31;
+                  _context51.next = 31;
                   break;
                 }
 
@@ -5729,7 +5673,7 @@ var Connext = function () {
 
               case 31:
                 if (!(threadInitialState.balanceB.ethDeposit && !threadInitialState.balanceB.ethDeposit.isZero())) {
-                  _context52.next = 33;
+                  _context51.next = 33;
                   break;
                 }
 
@@ -5737,7 +5681,7 @@ var Connext = function () {
 
               case 33:
                 if (!(threadInitialState.balanceB.tokenDeposit && !threadInitialState.balanceB.tokenDeposit.isZero())) {
-                  _context52.next = 35;
+                  _context51.next = 35;
                   break;
                 }
 
@@ -5750,11 +5694,11 @@ var Connext = function () {
                 threadInitialState.tokenBalanceA = threadInitialState.balanceA.tokenDeposit ? threadInitialState.balanceA.tokenDeposit : Web3.utils.toBN('0');
                 threadInitialState.tokenBalanceB = Web3.utils.toBN('0');
 
-                _context52.next = 41;
+                _context51.next = 41;
                 return this.getThreadInitialStates(channel.channelId);
 
               case 41:
-                threadInitialStates = _context52.sent;
+                threadInitialStates = _context51.sent;
 
                 threadInitialStates.push(threadInitialState); // add new vc state to hash
                 newRootHash = Connext.generateThreadRootHash({ threadInitialStates: threadInitialStates });
@@ -5793,23 +5737,23 @@ var Connext = function () {
                     tokenDeposit: threadInitialState.tokenBalanceA.add(threadInitialState.tokenBalanceB)
                   }
                 };
-                _context52.next = 51;
+                _context51.next = 51;
                 return this.createChannelStateUpdate(updateAtoI);
 
               case 51:
-                sigAtoI = _context52.sent;
-                return _context52.abrupt('return', sigAtoI);
+                sigAtoI = _context51.sent;
+                return _context51.abrupt('return', sigAtoI);
 
               case 53:
               case 'end':
-                return _context52.stop();
+                return _context51.stop();
             }
           }
-        }, _callee52, this);
+        }, _callee51, this);
       }));
 
-      function createChannelUpdateOnThreadOpen(_x74) {
-        return _ref79.apply(this, arguments);
+      function createChannelUpdateOnThreadOpen(_x72) {
+        return _ref78.apply(this, arguments);
       }
 
       return createChannelUpdateOnThreadOpen;
@@ -5817,15 +5761,15 @@ var Connext = function () {
   }, {
     key: 'createChannelStateOnThreadClose',
     value: function () {
-      var _ref81 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee53(_ref80) {
-        var latestThreadState = _ref80.latestThreadState,
-            subchan = _ref80.subchan,
-            _ref80$signer = _ref80.signer,
-            signer = _ref80$signer === undefined ? null : _ref80$signer;
+      var _ref80 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee52(_ref79) {
+        var latestThreadState = _ref79.latestThreadState,
+            subchan = _ref79.subchan,
+            _ref79$signer = _ref79.signer,
+            signer = _ref79$signer === undefined ? null : _ref79$signer;
         var methodName, isThreadState, isChannelObj, isAddress, accounts, threadInitialStates, newRootHash, subchanEthBalanceA, subchanEthBalanceI, subchanTokenBalanceA, subchanTokenBalanceI, updateAtoI;
-        return _regenerator2.default.wrap(function _callee53$(_context53) {
+        return _regenerator2.default.wrap(function _callee52$(_context52) {
           while (1) {
-            switch (_context53.prev = _context53.next) {
+            switch (_context52.prev = _context52.next) {
               case 0:
                 methodName = 'createChannelStateOnThreadClose';
                 isThreadState = { presence: true, isThreadState: true };
@@ -5836,26 +5780,26 @@ var Connext = function () {
                 Connext.validatorsResponseToError(validate.single(subchan, isChannelObj), methodName, 'subchan');
 
                 if (!signer) {
-                  _context53.next = 10;
+                  _context52.next = 10;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(signer, isAddress), methodName, 'signer');
-                _context53.next = 14;
+                _context52.next = 14;
                 break;
 
               case 10:
-                _context53.next = 12;
+                _context52.next = 12;
                 return this.web3.eth.getAccounts();
 
               case 12:
-                accounts = _context53.sent;
+                accounts = _context52.sent;
 
                 signer = accounts[0].toLowerCase();
 
               case 14:
                 if (!(signer.toLowerCase() !== subchan.partyA)) {
-                  _context53.next = 16;
+                  _context52.next = 16;
                   break;
                 }
 
@@ -5863,7 +5807,7 @@ var Connext = function () {
 
               case 16:
                 if (!(signer.toLowerCase() !== latestThreadState.partyA.toLowerCase() && signer.toLowerCase() !== latestThreadState.partyB.toLowerCase())) {
-                  _context53.next = 18;
+                  _context52.next = 18;
                   break;
                 }
 
@@ -5871,18 +5815,18 @@ var Connext = function () {
 
               case 18:
                 if (!(CHANNEL_STATES[subchan.state] !== CHANNEL_STATES.LCS_OPENED && CHANNEL_STATES[subchan.state] !== CHANNEL_STATES.LCS_SETTLING)) {
-                  _context53.next = 20;
+                  _context52.next = 20;
                   break;
                 }
 
                 throw new ThreadCloseError(methodName, 'Channel is in invalid state');
 
               case 20:
-                _context53.next = 22;
+                _context52.next = 22;
                 return this.getThreadInitialStates(subchan.channelId);
 
               case 22:
-                threadInitialStates = _context53.sent;
+                threadInitialStates = _context52.sent;
 
                 // array of state objects, which include the channel id and nonce
                 // remove initial state of vcN
@@ -5920,18 +5864,18 @@ var Connext = function () {
                   },
                   signer: signer
                 };
-                return _context53.abrupt('return', updateAtoI);
+                return _context52.abrupt('return', updateAtoI);
 
               case 31:
               case 'end':
-                return _context53.stop();
+                return _context52.stop();
             }
           }
-        }, _callee53, this);
+        }, _callee52, this);
       }));
 
-      function createChannelStateOnThreadClose(_x75) {
-        return _ref81.apply(this, arguments);
+      function createChannelStateOnThreadClose(_x73) {
+        return _ref80.apply(this, arguments);
       }
 
       return createChannelStateOnThreadClose;
@@ -5939,48 +5883,48 @@ var Connext = function () {
   }, {
     key: 'createCloseChannelState',
     value: function () {
-      var _ref82 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee54(channelState) {
+      var _ref81 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee53(channelState) {
         var sender = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var methodName, isAddress, accounts, channel, signer, finalState;
-        return _regenerator2.default.wrap(function _callee54$(_context54) {
+        return _regenerator2.default.wrap(function _callee53$(_context53) {
           while (1) {
-            switch (_context54.prev = _context54.next) {
+            switch (_context53.prev = _context53.next) {
               case 0:
                 methodName = 'createCloseChannelState';
                 isAddress = { presence: true, isAddress: true };
 
                 if (!sender) {
-                  _context54.next = 6;
+                  _context53.next = 6;
                   break;
                 }
 
                 Connext.validatorsResponseToError(validate.single(sender, isAddress), methodName, 'sender');
-                _context54.next = 10;
+                _context53.next = 10;
                 break;
 
               case 6:
-                _context54.next = 8;
+                _context53.next = 8;
                 return this.web3.eth.getAccounts();
 
               case 8:
-                accounts = _context54.sent;
+                accounts = _context53.sent;
 
                 sender = accounts[0].toLowerCase();
 
               case 10:
-                _context54.next = 12;
+                _context53.next = 12;
                 return this.getChannelByPartyA(sender.toLowerCase());
 
               case 12:
-                channel = _context54.sent;
+                channel = _context53.sent;
 
                 if (!channelState) {
-                  _context54.next = 23;
+                  _context53.next = 23;
                   break;
                 }
 
                 if (!(Number(channelState.openVcs) !== 0)) {
-                  _context54.next = 16;
+                  _context53.next = 16;
                   break;
                 }
 
@@ -5988,7 +5932,7 @@ var Connext = function () {
 
               case 16:
                 if (!(channelState.vcRootHash !== Connext.generateThreadRootHash({ threadInitialStates: [] }))) {
-                  _context54.next = 18;
+                  _context53.next = 18;
                   break;
                 }
 
@@ -6012,14 +5956,14 @@ var Connext = function () {
                 });
 
                 if (!(signer.toLowerCase() !== channel.partyI && signer.toLowerCase() !== channel.partyA)) {
-                  _context54.next = 21;
+                  _context53.next = 21;
                   break;
                 }
 
                 throw new ChannelCloseError(methodName, 'Channel member did not sign update');
 
               case 21:
-                _context54.next = 24;
+                _context53.next = 24;
                 break;
 
               case 23:
@@ -6059,18 +6003,18 @@ var Connext = function () {
                   signer: sender,
                   hubBond: channelState.hubBond
                 };
-                return _context54.abrupt('return', finalState);
+                return _context53.abrupt('return', finalState);
 
               case 26:
               case 'end':
-                return _context54.stop();
+                return _context53.stop();
             }
           }
-        }, _callee54, this);
+        }, _callee53, this);
       }));
 
-      function createCloseChannelState(_x77) {
-        return _ref82.apply(this, arguments);
+      function createCloseChannelState(_x75) {
+        return _ref81.apply(this, arguments);
       }
 
       return createCloseChannelState;
@@ -6100,18 +6044,18 @@ var Connext = function () {
 
   }, {
     key: 'createChannelStateUpdateFingerprint',
-    value: function createChannelStateUpdateFingerprint(_ref83) {
-      var channelId = _ref83.channelId,
-          isClose = _ref83.isClose,
-          nonce = _ref83.nonce,
-          openVcs = _ref83.openVcs,
-          vcRootHash = _ref83.vcRootHash,
-          partyA = _ref83.partyA,
-          partyI = _ref83.partyI,
-          ethBalanceA = _ref83.ethBalanceA,
-          ethBalanceI = _ref83.ethBalanceI,
-          tokenBalanceA = _ref83.tokenBalanceA,
-          tokenBalanceI = _ref83.tokenBalanceI;
+    value: function createChannelStateUpdateFingerprint(_ref82) {
+      var channelId = _ref82.channelId,
+          isClose = _ref82.isClose,
+          nonce = _ref82.nonce,
+          openVcs = _ref82.openVcs,
+          vcRootHash = _ref82.vcRootHash,
+          partyA = _ref82.partyA,
+          partyI = _ref82.partyI,
+          ethBalanceA = _ref82.ethBalanceA,
+          ethBalanceI = _ref82.ethBalanceI,
+          tokenBalanceA = _ref82.tokenBalanceA,
+          tokenBalanceI = _ref82.tokenBalanceI;
 
       // validate params
       var methodName = 'createChannelStateUpdateFingerprint';
@@ -6160,19 +6104,19 @@ var Connext = function () {
 
   }, {
     key: 'recoverSignerFromChannelStateUpdate',
-    value: function recoverSignerFromChannelStateUpdate(_ref84) {
-      var channelId = _ref84.channelId,
-          sig = _ref84.sig,
-          isClose = _ref84.isClose,
-          nonce = _ref84.nonce,
-          openVcs = _ref84.openVcs,
-          vcRootHash = _ref84.vcRootHash,
-          partyA = _ref84.partyA,
-          partyI = _ref84.partyI,
-          ethBalanceA = _ref84.ethBalanceA,
-          ethBalanceI = _ref84.ethBalanceI,
-          tokenBalanceA = _ref84.tokenBalanceA,
-          tokenBalanceI = _ref84.tokenBalanceI;
+    value: function recoverSignerFromChannelStateUpdate(_ref83) {
+      var channelId = _ref83.channelId,
+          sig = _ref83.sig,
+          isClose = _ref83.isClose,
+          nonce = _ref83.nonce,
+          openVcs = _ref83.openVcs,
+          vcRootHash = _ref83.vcRootHash,
+          partyA = _ref83.partyA,
+          partyI = _ref83.partyI,
+          ethBalanceA = _ref83.ethBalanceA,
+          ethBalanceI = _ref83.ethBalanceI,
+          tokenBalanceA = _ref83.tokenBalanceA,
+          tokenBalanceI = _ref83.tokenBalanceI;
 
       var methodName = 'recoverSignerFromChannelStateUpdate';
       // validate
@@ -6255,15 +6199,15 @@ var Connext = function () {
 
   }, {
     key: 'createThreadStateUpdateFingerprint',
-    value: function createThreadStateUpdateFingerprint(_ref85) {
-      var channelId = _ref85.channelId,
-          nonce = _ref85.nonce,
-          partyA = _ref85.partyA,
-          partyB = _ref85.partyB,
-          ethBalanceA = _ref85.ethBalanceA,
-          ethBalanceB = _ref85.ethBalanceB,
-          tokenBalanceA = _ref85.tokenBalanceA,
-          tokenBalanceB = _ref85.tokenBalanceB;
+    value: function createThreadStateUpdateFingerprint(_ref84) {
+      var channelId = _ref84.channelId,
+          nonce = _ref84.nonce,
+          partyA = _ref84.partyA,
+          partyB = _ref84.partyB,
+          ethBalanceA = _ref84.ethBalanceA,
+          ethBalanceB = _ref84.ethBalanceB,
+          tokenBalanceA = _ref84.tokenBalanceA,
+          tokenBalanceB = _ref84.tokenBalanceB;
 
       var methodName = 'createThreadStateUpdateFingerprint';
       // typecast balances incase chained
@@ -6310,16 +6254,16 @@ var Connext = function () {
 
   }, {
     key: 'recoverSignerFromThreadStateUpdate',
-    value: function recoverSignerFromThreadStateUpdate(_ref86) {
-      var sig = _ref86.sig,
-          channelId = _ref86.channelId,
-          nonce = _ref86.nonce,
-          partyA = _ref86.partyA,
-          partyB = _ref86.partyB,
-          ethBalanceA = _ref86.ethBalanceA,
-          ethBalanceB = _ref86.ethBalanceB,
-          tokenBalanceA = _ref86.tokenBalanceA,
-          tokenBalanceB = _ref86.tokenBalanceB;
+    value: function recoverSignerFromThreadStateUpdate(_ref85) {
+      var sig = _ref85.sig,
+          channelId = _ref85.channelId,
+          nonce = _ref85.nonce,
+          partyA = _ref85.partyA,
+          partyB = _ref85.partyB,
+          ethBalanceA = _ref85.ethBalanceA,
+          ethBalanceB = _ref85.ethBalanceB,
+          tokenBalanceA = _ref85.tokenBalanceA,
+          tokenBalanceB = _ref85.tokenBalanceB;
 
       var methodName = 'recoverSignerFromThreadStateUpdate';
       // validate
@@ -6383,8 +6327,8 @@ var Connext = function () {
     }
   }, {
     key: 'generateThreadRootHash',
-    value: function generateThreadRootHash(_ref87) {
-      var threadInitialStates = _ref87.threadInitialStates;
+    value: function generateThreadRootHash(_ref86) {
+      var threadInitialStates = _ref86.threadInitialStates;
 
       var methodName = 'generateThreadRootHash';
       var isArray = { presence: true, isArray: true };
