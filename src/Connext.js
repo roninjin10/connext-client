@@ -859,7 +859,7 @@ class Connext {
     const isHexStrict = { presence: true, isHexStrict: true }
     const isAddress = { presence: true, isAddress: true }
     Connext.threadId(
-      validate.single(channelId, isHexStrict),
+      validate.single(threadId, isHexStrict),
       methodName,
       'threadId'
     )
@@ -901,7 +901,7 @@ class Connext {
     }
 
     const thread0 = {
-      channelId,
+      channelId: threadId,
       nonce: 0,
       partyA: thread.partyA, // depending on ingrid for this value
       partyB: sender,
@@ -922,7 +922,7 @@ class Connext {
     const result = await this.joinThreadHandler({
       threadSig,
       subchanSig,
-      channelId
+      channelId: threadId
     })
     return result
   }
@@ -1489,7 +1489,7 @@ class Connext {
       throw new ChannelUpdateError(methodName, 'Channel is in invalid state')
     }
     // TO DO
-    let latestState = await this.getLatestChannelState(lcId, ['sigI'])
+    let latestState = await this.getLatestChannelState(channelId, ['sigI'])
     const result = await this.cosignChannelUpdate({
       channelId,
       nonce: latestState.nonce,
@@ -1514,6 +1514,7 @@ class Connext {
     const methodName = 'cosignChannelUpdate'
     const isHexStrict = { presence: true, isHexStrict: true }
     const isPositiveInt = { presence: true, isPositiveInt: true }
+    const isAddress = { presence: true, isAddress: true }
     Connext.validatorsResponseToError(
       validate.single(channelId, isHexStrict),
       methodName,
