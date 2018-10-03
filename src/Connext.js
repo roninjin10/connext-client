@@ -469,6 +469,7 @@ class Connext {
       methodName,
       'deposits'
     )
+    console.log('deposit 1')
     const accounts = await this.web3.eth.getAccounts()
     if (sender) {
       Connext.validatorsResponseToError(
@@ -489,6 +490,7 @@ class Connext {
       recipient = accounts[0].toLowerCase()
     }
 
+    console.log('deposit 2')
     const channel = await this.getChannelByPartyA(recipient)
     // verify channel is open
     if (CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENED) {
@@ -507,6 +509,7 @@ class Connext {
     }
 
     // call contract handler
+    console.log('deposit 3')
     const contractResult = await this.depositContractHandler({
       channelId: channel.channelId,
       deposits,
@@ -520,15 +523,19 @@ class Connext {
     }
 
     // poll until untracked deposit appears
+    console.log('deposit 4')
     const initialUntrackedDeposits = (await this.getUntrackedDeposits(channel.channelId)).length
     let untrackedDeposits
+    console.log('deposit 5')
     await interval(async (iterationNumber, stop) => {
+    console.log('deposit 6')
       untrackedDeposits = await this.getUntrackedDeposits(channel.channelId)
       if (untrackedDeposits !== [] && untrackedDeposits.length === initialUntrackedDeposits + 1) {
         stop()
       }
     }, 2000)
 
+    console.log('deposit 7')
     const results = await this.signUntrackedDeposits({
       untrackedDeposits,
       channelId: channel.channelId,
@@ -550,6 +557,7 @@ class Connext {
       methodName,
       'channelId'
     )
+    console.log('deposit 8')
     const response = await this.networking.get(
       `ledgerchannel/${channelId}/untrackeddeposits`
     )
@@ -577,11 +585,13 @@ class Connext {
         'sender'
       )
     } else {
+    console.log('deposit 9')
       const accounts = await this.web3.eth.getAccounts()
       sender = accounts[0]
     }
     
     // sign each of the deposit updates
+    console.log('deposit 10')
     const channel = await this.getChannelById(channelId)
     
     const depositedWithoutUpdates = channel.nonce === 0
@@ -626,6 +636,7 @@ class Connext {
               ? channelEthBalance = channelEthBalance
               : channelEthBalance = channelEthBalance.add(amountDeposited)
           )
+    console.log('deposit 11')
           sig = await this.createChannelStateUpdate({
           channelId: channel.channelId,
           nonce,
@@ -668,6 +679,7 @@ class Connext {
       console.log(`Posting signed ${signedDeposit.isToken ? 'ERC20' : 'ETH'} deposit of ${signedDeposit.deposit} to hub`)
       let result
       try {
+    console.log('deposit 12')
         result = (await this.networking.post(
           `ledgerchannel/${channel.channelId}/deposit`, 
           signedDeposit
@@ -1368,6 +1380,7 @@ class Connext {
     // get latest i-signed lc state update
     let channelState = await this.getLatestChannelState(channel.channelId, ['sigI'])
     // transform if needed
+    console.log('channelState', channelState)
     if (!channelState.balanceA || !channelState.balanceI) {
       channelState.balanceA = {
         ethDeposit: Web3.utils.toBN(channelState.ethBalanceA),
@@ -3689,6 +3702,7 @@ class Connext {
 
   async getLatestChannelState (channelId, sigs = null) {
     // lcState == latest ingrid signed state
+    console.log(methodName)
     const methodName = 'getLatestChannelState'
     const isHexStrict = { presence: true, isHexStrict: true }
     Connext.validatorsResponseToError(
@@ -3699,10 +3713,11 @@ class Connext {
     if (!sigs) {
       sigs = ['sigI', 'sigA']
     }
-
+    
     const response = await this.networking.get(
       `ledgerchannel/${channelId}/update/latest?sig[]=sigI`
     )
+    console.log('response', response)
     return response.data
   }
 
