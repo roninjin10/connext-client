@@ -1463,6 +1463,7 @@ class Connext {
   async cosignLatestChannelUpdate (channelId, sender = null) {
     const methodName = 'cosignLatestChannelUpdate'
     const isHexStrict = { presence: true, isHexStrict: true }
+    const isAddress = { presence: true, isAddress: true }
     Connext.validatorsResponseToError(
       validate.single(channelId, isHexStrict),
       methodName,
@@ -3739,6 +3740,7 @@ class Connext {
   async getChannelIdByPartyA (partyA = null, status = null) {
     const methodName = 'getChannelIdByPartyA'
     const isAddress = { presence: true, isAddress: true }
+    const isChannelStatus = { presence: true, isChannelStatus: true }
     if (partyA) {
       Connext.validatorsResponseToError(
         validate.single(partyA, isAddress),
