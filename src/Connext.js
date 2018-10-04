@@ -469,7 +469,6 @@ class Connext {
       methodName,
       'deposits'
     )
-    console.log('deposit 1')
     const accounts = await this.web3.eth.getAccounts()
     if (sender) {
       Connext.validatorsResponseToError(
@@ -490,7 +489,6 @@ class Connext {
       recipient = accounts[0].toLowerCase()
     }
 
-    console.log('deposit 2')
     const channel = await this.getChannelByPartyA(recipient)
     // verify channel is open
     if (CHANNEL_STATES[channel.state] !== CHANNEL_STATES.LCS_OPENED) {
@@ -509,7 +507,6 @@ class Connext {
     }
 
     // call contract handler
-    console.log('deposit 3')
     const contractResult = await this.depositContractHandler({
       channelId: channel.channelId,
       deposits,
@@ -523,19 +520,15 @@ class Connext {
     }
 
     // poll until untracked deposit appears
-    console.log('deposit 4')
     const initialUntrackedDeposits = (await this.getUntrackedDeposits(channel.channelId)).length
     let untrackedDeposits
-    console.log('deposit 5')
     await interval(async (iterationNumber, stop) => {
-    console.log('deposit 6')
       untrackedDeposits = await this.getUntrackedDeposits(channel.channelId)
       if (untrackedDeposits !== [] && untrackedDeposits.length === initialUntrackedDeposits + 1) {
         stop()
       }
     }, 2000)
 
-    console.log('deposit 7')
     const results = await this.signUntrackedDeposits({
       untrackedDeposits,
       channelId: channel.channelId,
@@ -557,7 +550,6 @@ class Connext {
       methodName,
       'channelId'
     )
-    console.log('deposit 8')
     const response = await this.networking.get(
       `ledgerchannel/${channelId}/untrackeddeposits`
     )
@@ -585,13 +577,11 @@ class Connext {
         'sender'
       )
     } else {
-    console.log('deposit 9')
       const accounts = await this.web3.eth.getAccounts()
       sender = accounts[0]
     }
     
     // sign each of the deposit updates
-    console.log('deposit 10')
     const channel = await this.getChannelById(channelId)
     
     const depositedWithoutUpdates = channel.nonce === 0
@@ -636,7 +626,6 @@ class Connext {
               ? channelEthBalance = channelEthBalance
               : channelEthBalance = channelEthBalance.add(amountDeposited)
           )
-    console.log('deposit 11')
           sig = await this.createChannelStateUpdate({
           channelId: channel.channelId,
           nonce,
@@ -679,7 +668,6 @@ class Connext {
       console.log(`Posting signed ${signedDeposit.isToken ? 'ERC20' : 'ETH'} deposit of ${signedDeposit.deposit} to hub`)
       let result
       try {
-    console.log('deposit 12')
         result = (await this.networking.post(
           `ledgerchannel/${channel.channelId}/deposit`, 
           signedDeposit
@@ -1379,8 +1367,30 @@ class Connext {
 
     // get latest i-signed lc state update
     let channelState = await this.getLatestChannelState(channel.channelId, ['sigI'])
+    let channelState2 = await this.getLatestChannelState(channel.channelId, ['sigA'])
     // transform if needed
-    console.log('channelState', channelState)
+
+    if (!channelState) {
+      // channel has never been updated
+      channelState = {
+        isClose: false,
+        channelId: channel.channelId,
+        nonce: 0,
+        openVcs: 0,
+        vcRootHash: Connext.generateThreadRootHash({ threadInitialStates: [] }),
+        partyA: channel.partyA,
+        partyI: this.ingridAddress,
+          balanceA: {
+            tokenDeposit: Web3.utils.toBN(channel.tokenBalanceA),
+            ethDeposit: Web3.utils.toBN(channel.ethBalanceA),
+          },
+          balanceI: {
+            tokenDeposit: Web3.utils.toBN(channel.tokenBalanceI),
+            ethDeposit: Web3.utils.toBN(channel.ethBalanceI),
+          }
+      }
+    }
+
     if (!channelState.balanceA || !channelState.balanceI) {
       channelState.balanceA = {
         ethDeposit: Web3.utils.toBN(channelState.ethBalanceA),
@@ -4389,16 +4399,29 @@ class Connext {
     const channel = await this.getChannelByPartyA(sender.toLowerCase())
     if (channelState) {
       // openVcs?
-      if (Number(channelState.openVcs) !== 0) {
+      if (channelState.openVcs && Number(channelState.openVcs) !== 0) {
+        console.log('open vcs', channelState.openVcs)
         throw new ChannelCloseError(methodName, 'Cannot close channel with open VCs')
       }
       // empty root hash?
-      if (channelState.vcRootHash !== Connext.generateThreadRootHash({ threadInitialStates: [] })) {
-        throw new ChannelCloseError(methodName, 'Cannot close channel with open VCs')
+      if (channelState.openVcs && channelState.vcRootHash !== Connext.generateThreadRootHash({ threadInitialStates: [] })) {
+        console.log('vcroothash')
+        throw new ChannelCloseError(methodName, 'Cannot close channel with empty root hash')
       }
+
+      const signNewlyOpenedChannel = () => this.createChannelStateUpdate({
+        isClose: false,
+        channelId: channelState.channelId,
+        nonce: channelState.nonce,
+        openVcs: channelState.openVcs,
+        vcRootHash: channelState.vcRootHash,
+        partyA: channelState.partyA,
+        balanceA: channelState.balanceA,
+        balanceI: channelState.balanceI,
+      })
       // member-signed?
       const signer = Connext.recoverSignerFromChannelStateUpdate({
-        sig: channelState.sigI ? channelState.sigI : channelState.sigA,
+        sig: channelState.sigI || channelState.sigA || await signNewlyOpenedChannel(),
         isClose: false,
         channelId: channel.channelId,
         nonce: channelState.nonce,
