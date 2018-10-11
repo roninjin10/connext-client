@@ -435,7 +435,7 @@ class Connext {
       sender
     })
 
-    return channelId
+    return {channelId, contractResult}
   }
 
   /**
@@ -536,9 +536,9 @@ class Connext {
     })
 
     if (results.length === 0) {
-      return results[0]
+      return {result: results[0], contractResult}
     } else {
-      return results
+      return {result: results, contractResult}
     }
   }
 
